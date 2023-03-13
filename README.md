@@ -1,6 +1,6 @@
-# 209 C++ Basics
+# 209 C++ OOP
 
-In this course, we'll learn all the basics to get us up and running far enough to be able to implement Nim / Tic-Tac-Toe!
+In this course, will dive into Object-Oriented Programming, which allows you to apply all learnt principles of C# to C++ as well.
 
 ## Passing Criteria
 TBD
