@@ -372,15 +372,24 @@ int main() {
 
 ## EXERCISE: CALCULATOR CLASS
 - Make an Object-Oriented Calculator Application
+- Calculator Class
+
+```cs
+Calculator calculator;
+calculator.SetNumber(5); // change the state (field)
+calculator.SetOperation(Operation::Add); // enum
+calculator.SetNumber(3);
+printf("%d, calculator.getNumber()); // return the result of the operation
+```
 
 ## Exercise: String-Class!
 
 Please do this exercise. We will continue working on this!
 
 ### private Members
-- `xxx length;`
-- `xxx buffer;`
-- `xxx maxSize;`
+- `xxx length;` how long is the string right now? e.g. 4 for "Marc"
+- `xxx buffer;` a way of storing maxSize characters
+- `xxx maxSize;` a variable that tells us, how big strings can be maximum
 
 ### public Members
 - `ctor(xxx maxSize)`
@@ -409,5 +418,7 @@ Please do this exercise. We will continue working on this!
   - returns a c-style string for the currently buffered contents
 
 ## EXERCISE: LINKED LIST
+- Like a C# List with Nodes internally
 
 ## EXERCISE: DYNAMIC ARRAY
+- Like a C# List with an Array internally
