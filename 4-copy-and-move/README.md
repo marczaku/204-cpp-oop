@@ -1,5 +1,19 @@
 # 4 Copy and Move
 
+Whenever we copy a value from a to b
+- an exact clone of the object is created
+  - but this sometimes requires some extra manual work, as we will see
+- this costs extra cpu-power and memory
+
+We can pass on pointers and references to avoid copies
+- but then, the memory is either limited to the current function scope
+- or the object needs to be allocated (and de-allocated) on the heap
+  - which costs extra performance and requires extra responsibility for freeing objects
+
+We will learn, how to correctly
+- create clones of objects when they are copied
+- avoid objects being cloned by "moving" them instead
+
 ## Copy Semantics
 After copying x to y they are
 - equivalent: x == y
