@@ -67,7 +67,7 @@ int increase(Point p){
 int main() {
 	Point original{3, 5};
 	Point result = increase(original);
-	printf("original: %d, result: %d", original, result);
+	printf("original: %d, result: %d", original.x, result.x);
 }
 ```
 
@@ -101,7 +101,7 @@ String(const String& other){
 ```
 
 Invoked When:
-- copying into uninitialized object
+- copying into an uninitialized object
 
 Shallow Copy:
 - copy pointer
@@ -109,20 +109,21 @@ Deep Copy:
 - look up object at pointer
 - allocate `new` object
 - assign new object pointer
-- copy date from old object to new
+- copy data from old object to new
 
 ### Copy Assignment
 
 ```cpp
 String& operator=(const String& other) {
 	if (this == &other) return *this; // performance benefit if `a = a`
+	// clean up current member values
 	// do copy logic
 	return *this;
 }
 ```
 
 Invoked When:
-- copying into initialized object
+- copying into an initialized object
 
 ### Default Copy
 
