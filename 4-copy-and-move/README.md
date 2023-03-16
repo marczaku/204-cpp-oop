@@ -36,6 +36,7 @@ e = a; // Copy Assignment: a into e
 ```
 
 ### Copying Base Data Types
+No surprises here, we know, how this works:
 ```cpp
 int increase(int number){
 	number++;
@@ -44,8 +45,8 @@ int increase(int number){
 
 int main() {
 	int original{1};
-	int result = increase(original);
-	printf("original: %d, result: %d", original, result);
+	int result = increase(original); // copy original to number & return value to result
+	printf("original: %d, result: %d", original, result); // copy original and result to function
 }
 ```
 
@@ -57,17 +58,18 @@ Member-wise copy
 ```cpp
 struct Vector2 {
 	int x,y;
-}
+};
 
-int increase(Point p){
+Vector2 increase(Vector2 p){
 	p.x++;
 	p.y++;
+	return p;
 }
 
 int main() {
-	Point original{3, 5};
-	Point result = increase(original);
-	printf("original: %d, result: %d", original, result);
+	Vector2 original{3, 5};
+	Vector2 result = increase(original); // copies all 8 bytes (x and y) to p and the return value back to result
+	printf("original: %d, result: %d", original.x, result.x);
 }
 ```
 
@@ -77,22 +79,29 @@ int main() {
 
 ```cpp
 int main() {
-	String a{ 50 };
-	a.append("Hello, World!");
-	a.print();
+	String a{"Hello", 7};
+	a.Print(); // a is fine
 	{
 		String b = a;
+		a.Print(); // a is still fine
 	}
-	a.print();
-	{
-		String c{ 50 };
-		c.append("Welcome back!");
-		a.print();
-	}
+	a.Print(); // now, a is broken!! :o
 }
 ```
 
+PROBLEM
+- we copy a from b
+  - this will copy length, maxSize and the pointer to the buffer from a to b
+- the scope of b is left
+  - b gets deconstructed
+    - which causes b to destroy its buffer
+	- which points to the same address on the heap as a's buffer
+  - and deallocated
+- now, we print a
+  - but its buffer got deleted by b
+
 ### Copy Constructor
+To fix this, we need more control over what happens, when one String gets copied to another.
 
 ```cpp
 String(const String& other){
@@ -101,22 +110,54 @@ String(const String& other){
 ```
 
 Invoked When:
-- copying into uninitialized object
+- copying into an uninitialized object
 
+```cpp
+String a{"Hello", 7};
+String b = a; // copy constructor
+```
+
+#### Two ways of copying objects:
 Shallow Copy:
-- copy pointer
+- copy pointer address
+- meaning, that both objects will reference the SAME address
+
+This is needed, if e.g. you want to clone an Enemy which has a reference to the Player. You don't want to clone the player, then, right?
+
+```cpp
+Player* target;
+
+Enemy(const Enemy& other){
+	// shallow copy, don't want to clone the player as well:
+	this.target = other.target;
+}
+```
+
 Deep Copy:
 - look up object at pointer
 - allocate `new` object
 - assign new object pointer
-- copy date from old object to new
+- copy data from old object to new
+
+This is needed e.g. when each unit has a Weapon and you want both the copied Unit to have a copy of the item, not share the same instance (An Item can't be in two places at the same time, right?)
+
+```cpp
+Item* item;
+
+Enemy(const Enemy& other){
+	// deep copy. We create a new Item on the HEAP and copy the other item into it:
+	this.item = new Item{other.item};
+}
+```
 
 ### Copy Assignment
+Unfortunately, that's not all. There's also a Copy Assignment Operator:
 
 ```cpp
 String& operator=(const String& other) {
 	if (this == &other) return *this; // performance benefit if `a = a`
-	// do copy logic
+	// first, clean up this object, e.g. delete Items, Buffers, etc.
+	// then, clone the other object, e.g. copy their Items, Buffers etc.
 	return *this;
 }
 ```
@@ -124,7 +165,55 @@ String& operator=(const String& other) {
 Invoked When:
 - copying into initialized object
 
+```cpp
+String a{"Hello", 7};
+String b{"World", 9}; // b is initialized
+b = a; // Copy Assignment, because b has already been initialized
+```
+
+This time, you need to ensure to clean up all objects that you deep copied:
+
+```cpp
+Item* item;
+
+Enemy& operator=(const Enemy& other) {
+	if (this == &other) return *this; // performance benefit if `a = a`
+	delete this.item; // delete the item that we had before copying the other object into us
+	this.item = new Item{other.item}; // now, copy the other item and use it
+}
+```
+
+But beware, this doesn't go for shallow copied objects:
+
+```cpp
+Player* target;
+
+Enemy& operator=(const Enemy& other) {
+	if (this == &other) return *this; // performance benefit if `a = a`
+	// delete this.target; DO NOT DO THIS, THIS WOULD DELETE THE PLAYER!!
+	this.target = other.target; // shallow copy the other enemy's target:
+}
+```
+
 ### Default Copy
+Why does the following code work, even though we haven't defined a copy constructor or assignment operator?
+```cpp
+struct Vector2{
+	int x,y;
+};
+
+int main(){
+	Vector2 a{2, 3};
+	Vector2 b = a; // copy constructor
+	b = Vector2{4, 5}; // coppy assignment
+}
+```
+
+The compiler generates default implementations for copy construction anc copy assignment
+- but that can be unintended
+
+To make your intention obvious
+- explicitly define that you want to use default implementations
 
 ```cpp
 struct Vector2{
@@ -133,13 +222,11 @@ struct Vector2{
 	Vector& operator=(const Vector&) = default;
 }
 ```
-The compiler generates default implementations for copy construction anc copy assignment
-- but that can be unintended
-
-To make your intention obvious
-- explicitly define that you want to use default implementations
 
 ### No Copy
+Some classes, you never want to be copied
+- e.g. a GameGrid which takes up a lot of Memory
+- mark the copy constructor and assignment operator as `delete`
 
 ```cpp
 struct GameGrid {
@@ -147,10 +234,6 @@ struct GameGrid {
 	GameGrid& operator=(const GameGrid&) = delete;
 }
 ```
-
-Some classes, you never want to be copied
-- e.g. a GameGrid which takes up a lot of Memory
-- mark the copy constructor and assignment operator as `delete`
 
 It will generate compile errors when trying to copy your class:
 
