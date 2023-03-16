@@ -372,14 +372,22 @@ int main() {
 
 ## EXERCISE: CALCULATOR CLASS
 - Make an Object-Oriented Calculator Application
-- Calculator Class
+  - Add a class named `Calculator`
+  - Implement the following functions:
 
 ```cs
 Calculator calculator;
 calculator.SetNumber(5); // change the state (field)
 calculator.SetOperation(Operation::Add); // enum
 calculator.SetNumber(3);
-printf("%d, calculator.getNumber()); // return the result of the operation
+printf("%d\n", calculator.getNumber()); // should say 8
+calculator.Clear();
+calculator.SetNumber(2);
+calculator.SetOperation(Operation::Multiply);
+calculator.SetNumber(3);
+calculator.SetOperation(Operation::Subtract);
+calculator.SetNumber(1);
+printf("%d\n", calculator.getNumber()); // should say 5
 ```
 
 ## Exercise: String-Class!
