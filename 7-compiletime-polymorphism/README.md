@@ -1,4 +1,4 @@
-# 7 Compile-Time Polymorphism
+# 8 Compile-Time Polymorphism
 Similar to Generics in C#
 
 ## Defining a Template Class
@@ -337,7 +337,10 @@ static_assert(-5 / 2 == -2);
 ```
 
 ## Non-Type Template Parameters
+You can use Non-Type Template Arguments
+- you can then pass constant values as template arguments
 
+The following program uses this technique for compile-time validated array access:
 ```cpp
 #include <cstdio>
 
@@ -356,3 +359,145 @@ int main()
     printf("%d\n", get<5>(numbers));
 }
 ```
+
+## Variadic Template
+You can write template functions that take unlimited number of arguments:
+
+```cpp
+// C++ program to demonstrate working of
+// Variadic function Template
+#include <iostream>
+using namespace std;
+ 
+void log() { cout << endl; };
+template <typename T, typename... Types>
+void log(T first, Types... others)
+{
+    cout << first;
+    log(others...);
+}
+ 
+int main()
+{
+    log(1, 2, 3.14, true, "Anything else");
+    return 0;
+}
+```
+
+## Template Specialization
+You can specialize template classes and functions for specific arguments
+- if you want it to behave differently for some arguments
+- e.g. a generic average function
+  - which would only for int arguments also round the result
+- similar to function overloading
+
+```cpp
+#include <iostream>
+using namespace std;
+ 
+template <class T>
+void fun(T a)
+{
+   cout << "The main template fun(): "
+        << a << endl;
+}
+ 
+template<>
+void fun(int a)
+{
+    cout << "Specialized Template for int type: "
+         << a << endl;
+}
+ 
+int main()
+{
+    fun<char>('a');
+    fun<int>(10);
+    fun<float>(10.14);
+}
+```
+
+## Template Instantiation
+It's interesting to know, when and why templates get instantiated and how to control it explicitly.
+
+```cpp
+template struct container<int>;
+```
+
+## Name Binding
+Depending on whether a template function depends on the template argument or not, the identifiers it binds to (variables, functions) is determined
+- the moment the generic template class is defined
+  - if it does not depend on the argument
+- the moment the template is instantiated
+  - if it does depend on the argument
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void f(double) { cout << "Function f(double)" << endl; }
+
+template <class A> struct container { // point of definition of container
+    void independentFunction() { f(1); } // f(int) not defined, yet
+    void dependentFunction(A arg) { f(arg); } // will be evaluated on instantiation
+};
+
+
+void f(int) { cout << "Function f(int)" << endl; }
+template struct container<int>; // point of instantiation of container<int>
+
+int main(void) {
+    container<int> test;
+    test.independentFunction(); // f double
+    test.dependentFunction(10); // f int
+    return 0;
+}
+```
+
+## Template Meta-Programming
+The Combination of
+- Template Specialization
+- Non-Type Template Arguments
+
+Allows you to write Code using Templates!
+
+Why is this special? Because Templates get evaluated at Compile-Time
+- i.e. their results get calculated before the program is run
+- which means that there is no overhead during runtime
+
+It is proven that Template Meta-Programming is Turing-Complete
+- i.e. any computation expressible by a computer program can be computed by a template meta-program
+
+This is a template that calculates, whether a number is a prime number:
+```cpp
+#include <iostream>
+using namespace std;
+
+template <int N, int D>
+struct is_prime_internal {
+    static const bool result = (N % D) && is_prime_internal<N, D - 1>::result;
+};
+
+template <int N>
+struct is_prime_internal<N, 1> {
+    static const bool result = true;
+};
+
+template <int N>
+struct is_prime {
+    static const bool result = is_prime_internal<N, N - 1>::result;
+};
+
+int main() {
+    cout << "Is 17 Prime: " << is_prime<17>::result << endl;
+    cout << "Is 17 Prime: " << is_prime<21>::result << endl;
+}
+```
+
+## EXERCISE: UPDATE YOUR LINKED-LIST AND/OR DYNAMIC ARRAY
+- Transform them into generic classes
+
+## EXERCISE: WRITE A GENERIC SORT FUNCTION
+- It takes a generic array as an argument
+- Or your Dynamic Array class
+- And then sorts the contents using a sorting algorithm of your choice

@@ -56,7 +56,7 @@ Above Code is quite complex and understanding exactly how `vector::push_back` wo
 class Hero {
     String _name;
 public:
-    Hero(String name) noexcept : _name{ name } { }
+    Hero(String name) : _name{ name } { }
 };
 
 int main() {
@@ -69,16 +69,16 @@ int main() {
 
 Output:
 ```
-string is constructed: Zeus
-creating a clone of string: Zeus
-creating a clone of string: Zeus
-String Zeus gets deconstructed
-string is constructed: Hercules
-creating a clone of string: Hercules
-String Hercules gets deconstructed
-String Hercules gets deconstructed
-String Zeus gets deconstructed
-String Zeus gets deconstructed
+String(): Zeus
+deep copy: Zeus
+deep copy: Zeus
+~String(): Zeus
+String(): Hercules
+deep copy: Hercules
+~String(): Hercules
+~String(): Hercules
+~String(): Zeus
+~String(): Zeus
 ```
 
 We have multiple issues in above code:
@@ -87,7 +87,7 @@ We have multiple issues in above code:
 
 ```cpp
     String zeusName{ "Zeus", 100 }; // string is constructed: Zeus
-    Hero zeus{ zeusName }; // creating a clone of string: Zeus from zeusName -> name
+    Hero zeus{ zeusName }; // deep copy string: Zeus from zeusName -> name
 ```
 
 Here, the `String` gets copied when it gets passed as an Argument to he Hero-Constructor
@@ -95,8 +95,8 @@ Here, the `String` gets copied when it gets passed as an Argument to he Hero-Con
 ### Copy to Class Field
 
 ```cpp
-    Hero(String name) noexcept :
-	_name{ name } {  // creating a clone of string: Zeus from name -> _name
+    Hero(String name) :
+	_name{ name } {  // deep copy string: Zeus from name -> _name
 
 	} // String Zeus(name) gets deconstructed
 ```
@@ -116,13 +116,42 @@ In the case of Hercules, no copy is created when the Hero-Constructor is invoked
 ### Copy to Class Field (Again)
 
 ```cpp
-    Hero(String name) noexcept :
-	_name{ name } {  // creating a clone of string: Hercules
+    Hero(String name) :
+	_name{ name } {  // deep copy string: Hercules
 
 	} // String Hercules gets deconstructed
 ```
 
 But the problem within the Hero Constructor still exists.
+
+## Use Reference For Constructor Argument
+First of all, we should use a reference as a constructor Argument. There is no need that the argument gets cloned when passed as a constructor argument, if it gets cloned when being assigned to the member variable anyways:
+
+```cpp
+    Hero(const String& name) :
+	_name{ name } {  // deep copy string: Hercules
+
+	} // String Hercules gets deconstructed
+```
+
+```cpp
+    String zeusName{ "Zeus", 100 }; // string is constructed: Zeus
+    Hero zeus{ zeusName }; // zeusName is passed as a reference, no more copy!
+```
+
+Output:
+```
+String(): Zeus
+// --------- FIXED: deep copy: Zeus
+deep copy: Zeus
+// --------- FIXED: ~String(): Zeus
+String(): Hercules
+deep copy: Hercules
+~String(): Hercules
+~String(): Hercules
+~String(): Zeus
+~String(): Zeus
+```
 
 ## Move Instead of Copy
 Idea: Within the Hero's Constructor, we know, that the `name` value is used for nothing else but for assigning it to `_name`, so how about we use that knowledge and tell c++ to:
@@ -131,7 +160,6 @@ Idea: Within the Hero's Constructor, we know, that the `name` value is used for 
   - move the buffer from the argument to the field
   - set the buffer on the argument to null
 - and then, when the argument gets destructed, it won't destroy the field's buffer
-
 
 ## Value Categories
 There is many value types:
@@ -217,6 +245,7 @@ void refType(int&& x) {
 }
 ```
 
+### Sample Code:
 ```cpp
 int main() {
 	auto x = 1;
@@ -237,9 +266,9 @@ refType(std::move(x));
 
 You should not use moved-from objects except to reassign or destruct them.
 
-We can use this knowledge to improve our Hero Constructor:
+We can use this knowledge to improve our Hero Constructor. We add a new RValue Reference Constructor:
 ```cpp
-    Hero(String&& name) noexcept :
+    Hero(String&& name) :
 	_name{ std::move(name) } {  // tell the compiler, that `name` can safely be moved
 	} // String (empty) gets deconstructed
 ```
@@ -249,7 +278,7 @@ We can use this knowledge to improve our Hero Constructor:
 But we also need to define a Move Constructor in our String class. Else, the compiler won't know, how to move our class and create copies instead:
 
 ```cpp
-String(String&& other) noexcept {
+String(String&& other) noexcept { // noexcept is necessary, because else the compiler will prefer using the String& constructor
 	printf("Moving %s\n", other.buffer);
 	// move all arguments from the other string to this string
 	// set the arguments to null on the other string
@@ -269,19 +298,25 @@ Don't forget to add null checks in the String's destructor now:
 
 Result:
 ```
-string is constructed: Zeus
-Deep Copy String(const string& "Zeus")
-Moving Zeus
-String (null) gets deconstructed
-string is constructed: Hercules
-Moving Hercules
-String (null) gets deconstructed
-String Hercules gets deconstructed
-String Zeus gets deconstructed
-String Zeus gets deconstructed
+String(): Zeus
+// --------- FIXED: deep copy: Zeus
+deep copy: Zeus
+// --------- FIXED: ~String(): Zeus
+String(): Hercules
+move: Hercules  // -------- FIXED: deep copy: hercules
+~String(): null // -------- FIXED: ~String(): Hercules
+~String(): Hercules
+~String(): Zeus
+~String(): Zeus
 ```
 
-Great! Two less deep copies of the String-class. But unfortunately, Zeus still gets deep copied when being passed as an Argument. Because it is an lvalue. We know, how to fix this:
+Great, this fixed the issue for String Hercules. This is, because it is an RValue
+- it has no identity, no variable name.
+
+But Zeus is an LValue
+- it has an identity, a variable name `zeusName`
+
+But we can convert it using `std::move`:
 
 ```cpp
 int main() {
@@ -294,20 +329,35 @@ int main() {
 }
 ```
 
+Result:
+```
+String(): Zeus
+// --------- FIXED: deep copy: Zeus
+move: Zeus --------- FIXED: deep copy: Zeus
+// --------- FIXED: ~String(): Zeus
+String(): Hercules
+move: Hercules  // -------- FIXED: deep copy: hercules
+~String(): null // -------- FIXED: ~String(): Hercules
+~String(): Hercules
+~String(): Zeus
+~String(): null // -------- FIXED: ~String(): Zeus
+```
+
 ## Move Assignment
-Furthermore, you should define the move assignment operator, for cases like this:
+Furthermore, you should define the move assignment operator, for cases like the following:
 
 ```cpp
 	String zeus{"Zeus", 7};
-	String hercules{"Hercules", 7};
-	// moves value from zeus to hercules:
+	String hercules{"Hercules", 7}; // here, hercules gets constructed
+	// moves value from zeus to hercules using move assignment operator:
 	hercules = std::move(zeus);
 	// should not use value of zeus anymore!
 
 ```
 
+This is how to:
 ```cpp
-String& operator=(String&& other) noexcept {
+String& operator=(String&& other) noexcept { //noexcept is needed again
 	if(this == other) return *this;
 	// clean up own values
 	// assign other values to own values
@@ -323,11 +373,15 @@ String& operator=(String&& other) noexcept {
 - Copy Assignment Operator
 - Move Assignment Operator
 
-If you don't define any of these, then all of these will be generated by the compiler. If you define any of these, only some of the other methods will be generated by the compiler.
+If you don't define any of these
+- then all of these will be generated by the compiler. 
+
+If you define any of these
+- only some of the other methods will be generated by the compiler.
 
 You can explicitly ask the compiler to generate some of these methods (or not):
 
 ```cpp
-String(String&& other) noexcept = default;
-String(String& other) = delete;
+String(String&& other) noexcept = default; // explicitly ask for default generated method
+String(String& other) = delete; // explicitly remove generation
 ```
