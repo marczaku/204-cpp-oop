@@ -160,3 +160,5 @@ static has no less than 4 meanings in C++
 
 ## EXERCISE: UPDATE STRING CLASS
 - Make methods and arguments const if they don't have to be non-const
+
+## EXERCISE: DO THE SAME FOR YOUR OTHER CLASSES
