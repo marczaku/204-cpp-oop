@@ -1,6 +1,6 @@
 # 7 Const
 - short for "constant"
-- i.e. "cannot be movied"
+- i.e. "cannot be modified"
 - gives compiler errors if violated
 
 ## Const Arguments
