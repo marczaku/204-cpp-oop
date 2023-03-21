@@ -132,7 +132,7 @@ public:
 
 ```cpp
 Timer timer;
-int  = timer; // implicit cast through operator
+int i = timer; // implicit cast through operator
 ```
 
 ### Automatic Type Conversion
@@ -150,11 +150,12 @@ int main() {
 }
 ```
 
-This is sometimes not desired and can be prevented by the `explicit` keyword:
+This is often not desired and can be prevented by the `explicit` keyword:
 
 ```cpp
 explicit Player(const char* name) : name{ name } {}
 ```
+
 This now fixes:
 ```cpp
     Player player = name; // COMPILE ERROR
