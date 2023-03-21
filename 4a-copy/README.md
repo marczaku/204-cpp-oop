@@ -1,25 +1,53 @@
 # 4 Copy
 
-Whenever we copy a value from a to b
-- an exact clone of the object is created
-  - but this sometimes requires some extra manual work, as we will see
-- this costs extra cpu-power and memory
+## Introduction
 
-We can pass on pointers and references to avoid copies
-- but then, the memory is either limited to the current function scope
-- or the object needs to be allocated (and de-allocated) on the heap
-  - which costs extra performance and requires extra responsibility for freeing objects
+Whenever we pass a value from a to b
+- an exact clone of the object should be created
 
-We will learn, how to correctly
-- create clones of objects when they are copied
+The problem is: Some objects might contain references (pointers) to other objects
+- e.g. the Monster carries an Item
+
+```cpp
+class Monster {
+   Item* item;
+};
+
+Monster original{new Item{}}; // Monster #1 carries Item #1
+```
+
+Now, if you copy the Monster, the Monster will be copied, but the Item will still be the same:
+
+```cpp
+Monster clone = original; // Monster #2 carries Item #1 as well!
+```
+
+This can lead to problems, e.g. if Monster b gets destructed:
+
+```cpp
+class Monster {
+  ~Monster(){ delete item; } // Monster deletes its item on death
+};
+
+delete clone; // Monster #2 deletes Item #1
+original.tryAttack(); // Monster #1's Item #1 has now been destroyed :(
+```
+
+What happened above is what's called a Shallow Copy
+- That is, a copy which copies all Members
+- But if those Members are References, they will still point to the same instance
+
+What we need, is a Deep Copy
+- That is, a copy which not only copies all Members
+- But also clones all Members, if those are References (Pointer Types)
 
 ## Copy Semantics
-After copying x to y they are
-- equivalent: x == y
-- independent: modifying x does not cause a modification of y
+After copying `a` to `b` they should be
+- equivalent: `a == b`
+- independent: modifying `a` does not cause a modification of `b`
 
 ## Copying Values
-
+Values are constantly copied whenever you assign them to another variable or a function parameter:
 ```cpp
 int foo(int input){
 	int result = input+1; // copying (input+1) into result
@@ -89,15 +117,20 @@ int main() {
 ```
 
 PROBLEM
-- we copy a from b
-  - this will copy length, maxSize and the pointer to the buffer from a to b
+- we construct a
+  - which dynamically allocates a buffer at lets say address `#117 `
+- we copy a to b
+  - this will copy length, maxSize and the pointer to the buffer `#117` from a to b
+  - a -> buffer `#117`
+  - b -> buffer `#117`
 - the scope of b is left
   - b gets deconstructed
-    - which causes b to destroy its buffer
-	- which points to the same address on the heap as a's buffer
+    - which causes b to destroy its buffer `#117`
+    - even though it is still used by a...
   - and deallocated
 - now, we print a
-  - but its buffer got deleted by b
+  - but its buffer `#117` got deleted by b
+  - so it prints some random text
 
 ### Copy Constructor
 To fix this, we need more control over what happens, when one String gets copied to another.
@@ -113,11 +146,12 @@ Invoked When:
 
 ```cpp
 String a{"Hello", 7};
-String b = a; // copy constructor
+String b = a; // copy constructor, because b gets constructed wit the value of a
 ```
 
-#### Two ways of copying objects:
-Shallow Copy:
+There are two ways of copying members:
+
+#### Shallow Copy
 - copy pointer address
 - meaning, that both objects will reference the SAME address
 
@@ -132,7 +166,7 @@ Enemy(const Enemy& other){
 }
 ```
 
-Deep Copy:
+#### Deep Copy
 - look up object at pointer
 - allocate `new` object
 - assign new object pointer
@@ -155,14 +189,14 @@ Unfortunately, that's not all. There's also a Copy Assignment Operator:
 ```cpp
 String& operator=(const String& other) {
 	if (this == &other) return *this; // performance benefit if `a = a`
-	// first, clean up this object, e.g. delete Items, Buffers, etc.
+	// first, clean up this object, e.g. delete existing Items, Buffers, etc.
 	// then, clone the other object, e.g. copy their Items, Buffers etc.
 	return *this;
 }
 ```
 
 Invoked When:
-- copying into initialized object
+- copying into already initialized object
 
 ```cpp
 String a{"Hello", 7};
