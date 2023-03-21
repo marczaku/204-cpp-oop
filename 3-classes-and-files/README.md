@@ -1,4 +1,8 @@
 # 3 Classes and Files
+
+<img width="270" alt="image" src="https://user-images.githubusercontent.com/7360266/226562162-90e9afce-3b48-4cf0-850e-8000339f0afc.png">
+
+
 There is multiple ways of dealing with classes and Files.
 - Generally, each class should be in its own `.h` and `.cpp` Files
 
@@ -10,6 +14,7 @@ Functions will be inlined.
 - advantage: high performance
 - duplicate: a lot of duplicate code in the binary
 ```cpp
+// Circle.h
 class Circle{
 	float radius;
 public:
