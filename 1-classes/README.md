@@ -392,12 +392,54 @@ printf("%d\n", calculator.getNumber()); // should say 5
 
 ## Exercise: String-Class!
 
-Please do this exercise. We will continue working on this!
+The String Class will be used to make using strings easier in C++!
+
+It will allow us to easily:
+- Create Strings
+- Modify Strings
+- Combine Strings
+- Compare Strings
+
+For now, we will have one limitation:
+- In the constructor, the user of the class must provide a `maxLength` for each string
+  - This `maxLength` may not be exceeded while using the class instance
+  - This makes it easier for you, so you won't have to resize the internal buffers
+- The reason is, that strings are internally arrays of characters, as you may know
+  - So, if you wanted your `string` class to be able to hold any string without the user providing a `maxLength`...
+  - ...you would have to implement something like a List / DynamicArray in C#
+  - which automatically resizes as new elements are added
+
+### Example Usage
+```cpp
+String helloWorld{"Hello", 100};
+helloWorld.appendLine(", World!");
+helloWorld.append("Alli");
+helloWorld.appendLine("hopa!");
+helloWorld.print();
+```
+
+Output:
+```
+Hello, World!
+Allihopa!
+```
+
+And all of that without having to think about Pointers or Arrays ever again
+
+In fact, C++ comes with its own OOP `string` class which we will use in the future!
 
 ### private Members
-- `xxx length;` how long is the string right now? e.g. 4 for "Marc"
-- `xxx buffer;` a way of storing maxSize characters
-- `xxx maxSize;` a variable that tells us, how big strings can be maximum
+You need to figure out the types yourself:
+- `xxx length;` 
+  - the length will tell us, how long the currently stored string is
+  - e.g. `4` for `"Marc"`
+- `xxx maxSize;`
+  - this variable will be provided by the user in the constructor
+  - and set a limitation on how long this string can ever become
+  - it may not be exceeded as the user appends more to this string
+- `xxx buffer;`
+  - the buffer is used to store the characters of this string
+  - you can use `maxSize` for the size of the buffer
 
 ### public Members
 - `ctor(xxx maxSize)`
@@ -428,5 +470,62 @@ Please do this exercise. We will continue working on this!
 ## EXERCISE: LINKED LIST
 - Like a C# List with Nodes internally
 
+Names in C++ are usually slightly different than in C#:
+- `int Count{get;}` -> `size_t length;`
+- `void Add(int)` -> `void push_back(size_t)`
+- `int Get(int)` -> `int at(size_t)`
+- `void Set(int, int)` -> `void assign(size_t, int)`
+- `void Clear()` -> `void clear()`
+- `void RemoveAt(int)` -> `void erase(size_t)`
+
+Example Usage:
+```cpp
+LinkedList list{};
+list.push_back(3);
+list.push_back(12);
+list.push_back(19);
+
+for(size_t i = 0; i < list.length; ++i){
+	printf("%d, ", list.at(i));
+}
+
+list.clear();
+printf("\nlength after clear: %zd\n", list.length);
+```
+
+Output:
+```
+3, 12, 19, 
+length after clear: 0
+```
+
 ## EXERCISE: DYNAMIC ARRAY
 - Like a C# List with an Array internally
+
+Names in C++ are usually slightly different than in C#:
+- `int Count{get;}` -> `size_t length;`
+- `void Add(int)` -> `void push_back(size_t)`
+- `int Get(int)` -> `int at(size_t)`
+- `void Set(int, int)` -> `void assign(size_t, int)`
+- `void Clear()` -> `void clear()`
+- `void RemoveAt(int)` -> `void erase(size_t)`
+
+```cpp
+DynamicArray dynArray{};
+dynArray.push_back(3);
+dynArray.push_back(12);
+dynArray.push_back(19);
+
+for(size_t i = 0; i < dynArray.length; ++i){
+	printf("%d, ", dynArray.at(i));
+}
+
+dynArray.clear();
+printf("\nlength after clear: %zd\n", dynArray.length);
+```
+
+Output:
+```
+3, 12, 19, 
+length after clear: 0
+```
