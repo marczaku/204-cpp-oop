@@ -1,7 +1,9 @@
 # 8 Compile-Time Polymorphism
 Similar to Generics in C#
 
-## Defining a Template Class
+## Template Class
+
+### Defining a Template Class
 
 ```cpp
 template<typename THealth>
@@ -16,7 +18,7 @@ struct Player
 };
 ```
 
-## Using a Template Class
+### Using a Template Class
 
 ```cpp
 int main()
@@ -30,7 +32,7 @@ int main()
 }
 ```
 
-### Invalid Type Arguments
+#### Invalid Type Arguments
 
 ```cpp
 struct Foo{};
@@ -41,7 +43,51 @@ int main()
 }
 ```
 
-## Defining a Template Function
+### Template Instantiation
+
+Every time, you use a template class with different type arguments
+- an exact copy of the class is created
+- and the type arguments are replaced with the provided ones
+- each copy is an independent class of its own
+- meaning, that `container<int>` and `container<bool>` are two independent classes after compilation:
+
+```cpp
+
+template<typename T>
+class container<T>{
+    T t;
+public:
+    container(T t) : t{t} {}
+    T get() {return t;}
+};
+
+int main(){
+    container<int>{5};
+    container<bool>{true};
+}
+```
+
+```cpp
+// Instantiation with int:
+class container<int> {
+    int t;
+public:
+    container(int t) : t{t} {}
+    int get() { return t; }
+};
+
+// Instantiation with bool:
+class container<bool> {
+    bool t;
+public:
+    container(bool t) : t{t} {}
+    bool get() { return t; }
+};
+```
+
+## Template Function
+
+### Defining a Template Function
 
 ```cpp
 template<typename TMessage>
@@ -51,7 +97,7 @@ void PrintMessage(const TMessage& message)
 }
 ```
 
-## Using a Template Function
+### Using a Template Function
 
 ```cpp
 struct ErrorMessage
@@ -67,12 +113,12 @@ int main()
 }
 ```
 
-## Samples: Named Conversion Functions
+## Examples: Named Conversion Functions
 
 ### const_cast
 
 Can be used to convert a const object to a non-constant one:
-
+- generally not a good idea!
 ```cpp
 void TakeDamage(const Unit& attacker, int damage) {
 	Unit& nonConstAttacker = const_cast<Unit&>(attacker);
@@ -83,7 +129,7 @@ void TakeDamage(const Unit& attacker, int damage) {
 ### static_cast
 
 Reverses an implicit conversion
-
+- a.k.a. down-casting
 ```cpp
 void Attack(Unit* target){
 	Ghost* ghost = static_cast<Ghost*>(target);
@@ -104,6 +150,46 @@ int main()
 }
 ```
 
+### dynamic_cast
+
+The most powerful casting operator
+- it looks at the runtime type of an object
+- it uses RTTI (run-time type information) for this
+  - this is information that is generated during compilation for all polymorphic classes
+  - it allows analysis of the type's information during runtime
+  - it requires that your class has at least one `virtual` member
+  - similar to C#'s `Reflection`
+- it works similar to C#'s type casting
+- it has no trouble with multiple inheritance:
+
+```cpp
+struct IFoo {
+    virtual void foo() = 0;
+};
+
+struct IBar {
+    virtual void bar() = 0;
+};
+
+struct FooBar : IFoo, IBar {
+    void foo(){}
+    void bar(){}
+};
+
+int main()
+{
+    FooBar* foobar = new FooBar{};  // 4a30
+    IFoo* foo = foobar;             // 4a30
+    IBar* bar = foobar;             // 4a38 offset of v-table pointer
+
+    void* a = static_cast<void*>(foo); // 4a30 -> GOOD!
+    void* b = static_cast<void*>(bar); // 4a38 -> does not point to foobar :(
+
+    void* c = dynamic_cast<void*>(foo); // 4a30 -> GOOD!
+    void* d = dynamic_cast<void*>(bar); // 4a30 -> fixed: now, same as foobar :)
+}
+```
+
 ### EXERCISE: narrow_cast
 
 > In Bjarne Stroustrup's "The C++(11) programming language" book, section "11.5 Explicit Type Conversion" you can see what it is.
@@ -118,18 +204,41 @@ int main()
 - Now, make the function runtime-polymorphic
 
 ## Template Type Deduction
+Useful: Often, the compiler can deduct
+- the template type arguments
+- from the arguments provided to a function
 
+In that case, the template type arguments do not need to be specified.
+
+### Example 1
+
+Given:
 ```cpp
 int a = 255;
-std::byte b = narrow_cast<int, std::byte>(a);
-// can be reduced to:
-std::byte b = narrow_cast<std::byte>(a);
 ```
 
 ```cpp
+std::byte b = narrow_cast<int, std::byte>(a);
+```
+
+Can be reduced to:
+```cpp
+std::byte b = narrow_cast<std::byte>(a);
+```
+
+### Example 2
+
+Given:
+```cpp
 int a[]{1,2,3,4,5,6};
+```
+
+```cpp
 int average = average<int>(a/*...*/)
-// can be reduced to:
+```
+
+Can be reduced to:
+```cpp
 int average = average(a);
 ```
 
@@ -144,7 +253,7 @@ T sqr(T value){
 int main() {
     int i = 5;
     sqr(i);
-    sqr(&i);
+    sqr(&i); // ERROR
 }
 ```
 
@@ -155,6 +264,9 @@ int main() {
 
 Similar to duck-typing
 > If it looks like a duck and quacks like a duck, then it must be type duck.
+
+Problem: Error messages look cryptic
+- Solution comes later
 
 ## Array Size Checking Through Templates
 
@@ -178,12 +290,29 @@ int main()
 ```
 
 ## Concepts
+- C++20 language feature
+- Allows to define constraints on template parameters
+
+Advantages:
+- more readable and expressive code
+- better error messages
+- improved compile-time performance
 
 ### Predefined Concepts
 [You can find them here](https://en.cppreference.com/w/cpp/concepts)
 
 ### Custom Concepts
+Syntax:
+```cpp
+template <typename T, typename U, ...>
+concept concept_name = requires (arg1, arg2, ...) {
+    expression -> return_type;
+    expression -> return_type;
+    ...
+};
+```
 
+For example, a concept that validates that a Type can be multiplied with itself:
 ```cpp
 template <typename T>
 concept multipliable = requires (T a, T b) {
@@ -193,7 +322,7 @@ concept multipliable = requires (T a, T b) {
 
 The expression needs to compile. It is not actually evaluated.
 
-### Using Concept as Type Constraints
+### Using Concepts as Type Requirements
 Postfix:
 ```cpp
 template<typename T>
@@ -251,13 +380,13 @@ size_t index_of_min(std::totally_ordered auto* values, size_t count)
 }
 ```
 
-### Using Concept as
-
 ### Concept Resolution
-The function specialization with the most specific constraints is chosen.\
+The function specialization with the most specific constraints is chosen.
 
 #### Problem:
-
+In this case, both functions are viable for type `Y`
+- `has_x` is one `concept` that checks for `x`
+- `coord` is one `concept` that checks for `x` and `y`
 ```cpp
 template <typename T>
 concept has_x = requires (T v) {
@@ -288,6 +417,13 @@ int main() {
 
 #### Solution:
 
+Here, `coord` uses the `has_x` concept in its definition:
+- `has_x` is one `concept` that checks for `x`
+- `coord` is two `concepts`:
+  - `has_x`
+  - and one that checks for `y`
+
+It is therefore more specialized than `has_x`
 ```cpp
 template <typename T>
 concept has_x = requires (T v) {
@@ -311,10 +447,6 @@ int main() {
     function(Y{}); // OK, coord is more specific
 }
 ```
-
-#### Rule of Thumb:
-- `A = (X1 ... XN); B = Y && (X1 ... XN);` B is considered to be more specific than A
-- `A = (X1 ... XN); B = Y || (X1 ... XN);` A is considered to be more specific than B
 
 ### EXERCISE: BUILD AN AVERAGEABLE CONCEPT AND USE IT
 Template:
@@ -356,7 +488,7 @@ int main()
 {
     int numbers[]{1, 2, 3, 4, 5};
     printf("%d\n", get<2>(numbers));
-    printf("%d\n", get<5>(numbers));
+    printf("%d\n", get<5>(numbers)); // compile error
 }
 ```
 
