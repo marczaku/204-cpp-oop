@@ -43,6 +43,22 @@ int main()
 }
 ```
 
+#### Nested Generics
+
+```cpp
+
+<template typename T>
+struct container{
+    T value;
+    container(T t) : value{t} {}
+};
+
+// ERROR: (Why?)
+container<container<int>>{container<int>{5}};
+// No Error:
+container< container< int > >{container< int >{5}};
+```
+
 ### Template Instantiation
 
 Every time, you use a template class with different type arguments
@@ -84,6 +100,63 @@ public:
     bool get() { return t; }
 };
 ```
+
+Force Compiler to instantiate Template with given parameters
+
+```cpp
+// force instantiation with float
+template class container<float>;
+```
+
+### Compilation
+Not compiled like ordinary code
+- compiled when first used
+- therefore, must be in a header-file
+  - to be visible from the code instantiating the template
+  - therefore, template code needs to be in header files
+
+Template code in `cpp` file can only be used within that file
+  - otherwise linker error
+
+```cpp
+// Player.h
+#pragma once
+
+template<typename THealth>
+struct Player
+{
+	THealth health;
+
+	void foo(){}
+	void bar();
+};
+```
+
+```cpp
+// Player.cpp
+#include "Player.h"
+template<typename THealth>
+void Player<THealth>::bar(){}
+```
+
+```cpp
+// Game.cpp
+#include "Player.h"
+
+int main() {
+	Player<float> player{};
+	player.foo();
+	player.bar(); // LINKER ERROR :(
+}
+```
+
+Can fix above error by forcing template instantiation in Player Header or Cpp File:
+
+```cpp
+template struct Player<float>;
+```
+
+But you'd have to know about all possible type arguments that you might use in the future.
 
 ## Template Function
 
@@ -242,7 +315,17 @@ Can be reduced to:
 int average = average(a);
 ```
 
-## Type Checking in Templates
+## Concepts
+
+- C++20 language feature
+- Allows to define constraints on template parameters
+
+Advantages:
+- more readable and expressive code
+- better error messages
+- improved compile-time performance
+
+### Problem: Type Checking in Templates
 
 ```cpp
 template<typename T>
@@ -267,36 +350,6 @@ Similar to duck-typing
 
 Problem: Error messages look cryptic
 - Solution comes later
-
-## Array Size Checking Through Templates
-
-```cpp
-#include <cstdio>
-
-template<size_t N>
-void print_all(int (&a)[N])
-{
-    for(const auto b : a)
-    {
-        printf("%d, ", b);
-    }
-}
-
-int main()
-{
-    int numbers[]{1, 2, 3, 4, 5};
-    print_all(numbers);
-}
-```
-
-## Concepts
-- C++20 language feature
-- Allows to define constraints on template parameters
-
-Advantages:
-- more readable and expressive code
-- better error messages
-- improved compile-time performance
 
 ### Predefined Concepts
 [You can find them here](https://en.cppreference.com/w/cpp/concepts)
@@ -490,6 +543,35 @@ int main()
     printf("%d\n", get<2>(numbers));
     printf("%d\n", get<5>(numbers)); // compile error
 }
+```
+
+### Example: Array Size Checking Through Templates
+
+```cpp
+#include <cstdio>
+
+template<size_t N>
+void print_all(int (&a)[N])
+{
+    for(const auto b : a)
+    {
+        printf("%d, ", b);
+    }
+}
+
+int main()
+{
+    int numbers[]{1, 2, 3, 4, 5};
+    print_all(numbers);
+}
+```
+
+### Example: GameGrid
+```cpp
+template<int cols, int rows>
+class Grid{
+    Cell cells[cols][rows];
+};
 ```
 
 ## Variadic Template
