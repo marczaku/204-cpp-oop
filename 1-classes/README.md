@@ -8,7 +8,7 @@
 - Member Functions
 - Have access to all class Members
 
-```cpp
+```c++
 struct Time {
 	void addYear() {
 		year++;
@@ -17,7 +17,7 @@ struct Time {
 };
 ```
 
-```cpp
+```c++
 int main() {
   	Time time;
 	time.year = 2022;
@@ -29,9 +29,9 @@ int main() {
 
 ## Access Control
 
-- structs are `public` per default:
+Structs are `public` per default:
 
-```cpp
+```c++
 struct Time {
 	void addYear() {
 		year++;
@@ -49,9 +49,9 @@ private:
 }
 ```
 
-- classes are `private` per default:
+Classes are `private` per default:
 
-```cpp
+```c++
 class Time {
 	int year;
 public:
@@ -69,25 +69,28 @@ public:
 }
 ```
 
-- there is no other difference between `struct` and `class` in C++!
+There is no other difference between `struct` and `class` in C++!
 
 ## Initializing Members
 
 What's the problem in the following code?
 
-```cpp
+```c++
 int main() {
-	Time time;
-	clock.setYear(1980);
-	printf("Time: %d\n", time.getYear());
+	Time clock;
+	printf("Time: %d\n", clock.getYear());
 	clock.addYear();
-	printf("Time: %d\n", time.getYear());
+	printf("Time: %d\n", clock.getYear());
 }
 ```
 
 ## Constructors
 
-```cpp
+Give you control over how objects are constructed
+- which arguments need to be provided
+- how those arguments are used
+
+```c++
 Time() {
 	year = 2022;
 }
@@ -99,7 +102,7 @@ Time(int in_year) {
 }
 ```
 
-```cpp
+```c++
 int main() {
 	Time a();
 	Time b(2030);
@@ -108,76 +111,51 @@ int main() {
 
 ## Initialization
 
+TLDR: Always initialize using Braces `{}` (uniform initializer)
+
 ### Fundamental Type: Zero
 
-```cpp
-int a = 0;
-int b {};
-int c = {};
+```c++
+int b {}; // c++
+int a = 0; // c#
+// int c = {}; // also possible
 int d; // uninitialized
 ```
 
 ### Fundamental Type: Arbitrary Value
 
-```cpp
-int e = 42;
-int f{42};
-int g = {42};
-int h(42);
+```c++
+int f{42}; // c++
+int e = 42; // c#
+// int g = {42}; // also possible
+// int h(42); // also possible
 ```
 
 ### PODs
 
-```cpp
+```c++
 struct Pod {
 	uint64_t a;
 	char b[256];
 	bool c;
 };
+```
 
+```c++
 int main() {
-	Pod pod1{};
-	Pod pod2 = {};
-	Pod pod3{42, "Hello"};
-	Pod pod4{42, "Hello", true};
+	Pod pod1{}; // default values
+	Pod pod3{42, "Hello"}; // some variables
+	Pod pod4{42, "Hello", true}; // all variables
 	// Pod pod5 = 0;
 	// Pod pod6{"Hello", 42}; // invalid types/order
 	// Pod pod7(42, "Hello", true); // does not work
+	// Pod pod1; // uninitialized
 }
 ```
-
-#### Call-By-Value
-
-```cpp
-#include <cstdio>
-
-struct Pod {
-	int a;
-	char b[256];
-	bool c;
-};
-
-void modify(Pod pod) {
-	pod.a = 99;
-	pod.c = false;
-	printf("Pod changed: %d, %s, %d\n", pod.a, pod.b, pod.c);
-}
-
-int main() {
-	Pod pod{42, "Hello", true};
-	printf("Pod before: %d, %s, %d\n", pod.a, pod.b, pod.c);
-	modify(pod);
-	printf("Pod after: %d, %s, %d\n", pod.a, pod.b, pod.c);
-}
-```
-
-Whenever you assign a value to a new variable
-- a copy is created
-- if you modify that copy, the original remains unaffected
 
 ### Arrays
 
-```cpp
+```c++
 int array1[]{1,2,3}; // 1, 2, 3
 int array2[5]{}; // 0, 0, 0, 0, 0
 int array3[5]{1,2,3}; // 1, 2, 3, 0, 0
@@ -186,7 +164,7 @@ int array4[5]; // uninitialized
 
 ### Fully Featured Classes
 
-```cpp
+```c++
 struct SuchClass {
 	SuchClass() {
 		printf("(no argument)\n");
@@ -200,43 +178,48 @@ struct SuchClass {
 }
 ```
 
-```cpp
+```c++
 int main(){
-	SuchClass s1;
-	SuchClass s2{};
-	SuchClass s3{'c'};
-	SuchClass s4{255};
-	SuchClass s5('g');
-	SuchClass s6 = {'l'};
+	SuchClass s1; // implicit default constructor
+	SuchClass s2{}; // explicit default constructor
+	SuchClass s3{'c'}; // constructor #2
+	SuchClass s4{255}; // constructor #3
+	// SuchClass s5('g'); // also possible
+	// SuchClass s6 = {'l'}; // also possible
 	SuchClass s7(); // Function Declaration :o) // most vexing parse
 }
 ```
 
 ### Narrowing Conversions
 
-```cpp
+When not using Braces, you sometimes don't notice when you accidentally lose information
+- e.g. here, the result should be `0.5f`, but as `int` it is `0`
+
+```c++
 float a{1};
 float b{2};
-int narrowedResult(a/b); // ignored
-int result{a/b}; // warning
+int narrowedResult(a/b); // warning or ignored
+int result{a/b}; // error or warning
 ```
 
 #### Initializing Class Members
 
-```cpp
+```c++
 struct Customer{
-	bool active = true;
-	int probationPeriod{6};
-	char name[256] = {"unnamed"};
+	int probationPeriod{6}; // c++
+	bool active = true; // c#
+	// char name[256] = {"unnamed"}; // also possible
+	
 	// int notPossible(5);
 };
 ```
 
 
 ### Initializing Class Members In Constructor
+
 Problem:
 
-```cpp
+```c++
 #include <stdio.h>
 
 struct SomeMember{
@@ -255,23 +238,26 @@ class Inefficient{
   SomeMember _member;
   public:
     Inefficient(){
-      _member = SomeMember(5);
+      _member = SomeMember{5};
     }
 };
 
 int main(){
-  Inefficient inefficient;
+  Inefficient inefficient{};
 }
 ```
 
 Inefficient!
 
+### Initializer List
+
 Solution: Initializer List
-```cpp
+
+```c++
 class Efficient{
   SomeMember _member;
 public:
-  Efficient() : _member(SomeMember(5)) {}
+  Efficient() : _member{SomeMember{5}} {}
 };
 ```
 
@@ -280,11 +266,15 @@ public:
 - Uniform Initialization
 
 ## Destructor
+
+Function that's called when your object is freed ("destroyed")
+
+Use Cases:
 - release file handles
 - flush network sockets
 - free dynamic objects
 
-```cpp
+```c++
 struct Monster{
 	~Monster(){
 		printf("<dramatic deathrattle>\n");
@@ -292,7 +282,7 @@ struct Monster{
 }
 ```
 
-```cpp
+```c++
 int main(){
 	printf("creating monster.\n");
 	{
@@ -304,9 +294,9 @@ int main(){
 
 
 ## This-Pointer
-Sometimes, you need to access the `current object` from a method. As in, the object on which the Method is currently being invoked. e.g. when attacking:
+Sometimes, you need to access the `current object` from withn a method. As in, the object on which the Method is currently being invoked. e.g. when attacking:
 
-```cpp
+```c++
 #include <cstdio>
 struct Unit{
 	char* name;
@@ -333,13 +323,16 @@ int main(){
 ```
 
 C++ Behind the Scenes:
-- this-pointer is an implicit, hidden parameter of every non-static member function
+- `this`-pointer is an implicit, hidden parameter of every non-static member function
 - access to data member or call to member function is done by dereferencing this pointer
 - is done implicitly, can also be done explicitly
 
 ## Static
 
-```cpp
+Variables and Methods that are not associated with a class instance
+- can not access `this`
+
+```c++
 #include <cstdio>
 
 struct Battery {
@@ -410,7 +403,7 @@ For now, we will have one limitation:
   - which automatically resizes as new elements are added
 
 ### Example Usage
-```cpp
+```c++
 String helloWorld{"Hello", 100};
 helloWorld.appendLine(", World!");
 helloWorld.append("Alli");
@@ -479,7 +472,7 @@ Names in C++ are usually slightly different than in C#:
 - `void RemoveAt(int)` -> `void erase(size_t)`
 
 Example Usage:
-```cpp
+```c++
 LinkedList list{};
 list.push_back(3);
 list.push_back(12);
@@ -510,7 +503,7 @@ Names in C++ are usually slightly different than in C#:
 - `void Clear()` -> `void clear()`
 - `void RemoveAt(int)` -> `void erase(size_t)`
 
-```cpp
+```c++
 DynamicArray dynArray{};
 dynArray.push_back(3);
 dynArray.push_back(12);

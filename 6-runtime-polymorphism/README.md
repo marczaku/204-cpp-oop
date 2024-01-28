@@ -2,7 +2,7 @@
 Inheritance-Based Polymorphism like in C#
 
 ## Inheritance
-```cpp
+```c++
 class Animal {
 
 }
@@ -17,7 +17,7 @@ class Dog : public Animal {
 ### Constructor Chaining
 Base Constructors get always called first
 - Default Constructor, if not specified manually
-```cpp
+```c++
 class Animal {
     const char* name;
 public:
@@ -34,7 +34,7 @@ public:
 ### Memory Layout
 - Polymorphism
   - Dog IS AN Animal
-```cpp
+```c++
 class Animal {
     float weight;
 	int age;
@@ -48,14 +48,14 @@ class Dog : public Animal {
 
 #### Conversion
 - Type `Dog` "shrinks" to Type `Animal`
-```cpp
+```c++
 Animal animal = Dog{};
 ```
 
 ### Hiding Members
 - Early Binding
 
-```cpp
+```c++
 struct Animal {
     void MakeSound() { printf("...\n"); }
 };
@@ -76,7 +76,7 @@ int main()
 ### Virtual Methods
 - Late Binding
 
-```cpp
+```c++
 struct Animal {
     virtual void MakeSound() { printf("...\n"); }
 };
@@ -103,7 +103,7 @@ int main()
 
 ### Value Types
 What's wrong with this code?
-```cpp
+```c++
 int main()
 {
     Animal dog = Dog{};
@@ -115,7 +115,7 @@ int main()
 You can change virtual function's return types
 - If the Type is co-variant
 
-```cpp
+```c++
 struct Animal {
     virtual Animal* Clone() {/*...*/};
 };
@@ -128,7 +128,7 @@ struct Dog : public Animal {
 ## Destructor
 Memory Leak:
 
-```cpp
+```c++
 struct Animal {
     virtual void MakeSound() {}
 };
@@ -150,7 +150,7 @@ int main()
 
 Fix: Virtual Destructor
 
-```cpp
+```c++
 struct Animal {
     virtual void MakeSound() {}
     virtual ~Animal() {};
@@ -175,7 +175,7 @@ int main()
 - Cannot be instantiated
 - But classes can inherit from this class
   - And those can be instantiated
-```cpp
+```c++
 struct Animal {
     virtual void MakeSound() = 0;
 };
@@ -193,7 +193,7 @@ int main()
 
 ### Abstract Type Variables
 Why does this code not compile?
-```cpp
+```c++
 struct Animal {
     virtual void MakeSound() = 0;
 };
@@ -210,7 +210,7 @@ int main(){
 
 ## Multiple Inheritance
 
-```cpp
+```c++
 struct Animal {
 
 };
@@ -240,7 +240,7 @@ No Pointer Identity!
   - walkingSpeed;
 - Pegasus
 
-```cpp
+```c++
 Pegasus value;
 Pegasus* pegasus = &value;
 WalkingAnimal* walking = &value;
@@ -248,7 +248,7 @@ FlyingAnimal* flying = &value;
 ```
 
 ### Name Clashes
-```cpp
+```c++
 struct FlyingAnimal {
 	float flyingSpeed;
 	virtual void Fly(){}
@@ -264,14 +264,14 @@ struct WalkingAnimal{
 
 Need to be fully qualified
 
-```cpp
+```c++
 printf("%f", pegasus.WalkingAnimal::GetSpeed());
 printf("%f", pegasus.FlyingAnimal::GetSpeed());
 ```
 
 
 ### Dreaded Diamond
-```cpp
+```c++
 struct Animal {
 	int age;
 }
@@ -290,7 +290,7 @@ struct WalkingAnimal : public Animal {
 
 ### Virtual Base Class
 - Virtual Base Classes are only inherited once
-```cpp
+```c++
 struct Animal {
 	int age;
 }
@@ -311,7 +311,7 @@ Bad if Mixed!
 
 ### Casting
 Not possible using C-Style cast!
-```cpp
+```c++
 Pegasus* pegasus = new Pegasus();
 Animal* animal = pegasus; // OK
 Pegasus* pegasusAgain = (Pegasus*) animal; // ERROR
@@ -319,7 +319,7 @@ Pegasus* pegasusAgain = (Pegasus*) animal; // ERROR
 
 Use `dynamic_cast`:
 
-```cpp
+```c++
 Pegasus* pegasusAgain = dynamic_cast<Pegasus*>(animal); // OK
 ```
 
@@ -354,7 +354,7 @@ Now follows an example for Polymorphism:
 
 ### Problem without Polymorphism
 
-```cpp
+```c++
 #include <cstdio>
 
 struct BaseLogger{
@@ -384,7 +384,7 @@ int main()
 ### Virtual Methods
 Allows deriving class to override a method implementation
 
-```cpp
+```c++
 #include <cstdio>
 
 struct BaseLogger{
@@ -412,7 +412,7 @@ int main()
 
 ### Abstract Method
 
-```cpp
+```c++
 struct ILogger{
 	virtual void Log(const char* message) = 0;
 };
@@ -422,7 +422,7 @@ struct ILogger{
 
 You define interfaces in C++ by defining a purely virtual class:
 
-```cpp
+```c++
 struct ILogger {
 	virtual ~ILogger() = default;
 	virtual void Log(const char* message) = 0;
@@ -433,14 +433,14 @@ struct ILogger {
 
 If you don't define a virtual constructor in the base class, the runtime can't invoke the correct Destructor if you do:
 
-```cpp
+```c++
 ILogger logger = new ConsoleLogger{};
 delete logger;
 ```
 
 ### Implementing Interfaces
 
-```cpp
+```c++
 struct ConsoleLogger : ILogger {
 	void Log(const char* message) override {
 		printf("Log: %s", message);
@@ -452,7 +452,7 @@ struct ConsoleLogger : ILogger {
 
 #### Constructor Injection
 
-```cpp
+```c++
 struct Player {
 	Player(ILogger& logger) : logger{logger} {}
 
@@ -462,7 +462,7 @@ private:
 };
 ```
 
-```cpp
+```c++
 int main()
 {
 	ConsoleLogger logger{};
@@ -473,7 +473,7 @@ int main()
 
 #### Property Injection
 
-```cpp
+```c++
 struct Player {
 	void SetLogger(ILogger* logger){
 		this->logger = logger;
@@ -487,7 +487,7 @@ private:
 };
 ```
 
-```cpp
+```c++
 int main()
 {
 	ILogger* logger = new ConsoleLogger{};
@@ -499,7 +499,7 @@ int main()
 
 ### Or Both
 
-```cpp
+```c++
 struct Player {
 	Player(ILogger* logger) : logger{logger} {}
 	void SetLogger(ILogger* logger){

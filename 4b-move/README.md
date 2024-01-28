@@ -14,7 +14,7 @@ We will learn:
   - to further use `b`
   - and not use `a` anymore
 
-```cpp
+```c++
 int main() {
 	std::vector<String> heroes;
 	heroes.push_back(String{ 100,"Hercules" });
@@ -52,7 +52,7 @@ That's a lot of resources wasted!
 ## Simpler Sample
 Above Code is quite complex and understanding exactly how `vector::push_back` works is not so easy, so here's a simpler code snippet to continue with:
 
-```cpp
+```c++
 class Hero {
     String _name;
 public:
@@ -85,7 +85,7 @@ We have multiple issues in above code:
 
 ### Copy to Constructor Argument
 
-```cpp
+```c++
     String zeusName{ "Zeus", 100 }; // string is constructed: Zeus
     Hero zeus{ zeusName }; // deep copy string: Zeus from zeusName -> name
 ```
@@ -94,7 +94,7 @@ Here, the `String` gets copied when it gets passed as an Argument to he Hero-Con
 
 ### Copy to Class Field
 
-```cpp
+```c++
     Hero(String name) :
 	_name{ name } {  // deep copy string: Zeus from name -> _name
 
@@ -107,7 +107,7 @@ When the Constructor ends, the `name` Argument is not used anymore and gets Dest
 
 ### No Copy to Constructor Argument
 
-```cpp
+```c++
 Hero hercules{ String{ "Hercules", 100 } };
 ```
 
@@ -115,7 +115,7 @@ In the case of Hercules, no copy is created when the Hero-Constructor is invoked
 
 ### Copy to Class Field (Again)
 
-```cpp
+```c++
     Hero(String name) :
 	_name{ name } {  // deep copy string: Hercules
 
@@ -127,14 +127,14 @@ But the problem within the Hero Constructor still exists.
 ## Use Reference For Constructor Argument
 First of all, we should use a reference as a constructor Argument. There is no need that the argument gets cloned when passed as a constructor argument, if it gets cloned when being assigned to the member variable anyways:
 
-```cpp
+```c++
     Hero(const String& name) :
 	_name{ name } {  // deep copy string: Hercules
 
 	} // String Hercules gets deconstructed
 ```
 
-```cpp
+```c++
     String zeusName{ "Zeus", 100 }; // string is constructed: Zeus
     Hero zeus{ zeusName }; // zeusName is passed as a reference, no more copy!
 ```
@@ -179,7 +179,7 @@ Generally, you can group the values by:
 
 `lvalue`: a value with an identity, a variable. It usually can't be moved, because you might want to continue using the original value:
 
-```cpp
+```c++
 String zeusName{"Zeus", 7}; // zeusName is an lvalue
 Hero zeus{zeusName}; // the value can't be moved instead of copied...
 zeusName.append("7"); // ... because we can still manipulate zeusName
@@ -192,7 +192,7 @@ String odysseusName = zeusName; // but also on the right side
 
 `prvalue`: a pure right value, which means, a value that can never stand on the left side of an assignment, e.g.:
 
-```cpp
+```c++
 String{"Zeus", 7}; // this is a pr value
 
 String zeusName = String{"Zeus", 7};
@@ -207,7 +207,7 @@ String{"Zeus", 7} = zeusName; // not possible
 
 `xvalue`: these are more problematic. These are values that can be moved, even though they have an identity. The Compiler can't be sure, whether the value can be moved or not, so we need to specify it:
 
-```cpp
+```c++
 Hero zeus{};
 {
 	String zeusName{"Zeus", 7}; // we create a variable
@@ -218,7 +218,7 @@ Hero zeus{};
 
 But the compiler can't know this on its own. But we can tell the compiler that the variable can be safely moved:
 
-```cpp
+```c++
 Hero zeus{};
 {
 	String zeusName{"Zeus", 7}; // we create a variable
@@ -231,7 +231,7 @@ Hero zeus{};
 When we define reference arguments, there is two ways of defining them:
 
 ### LValue Reference
-```cpp
+```c++
 #include <cstdio>
 void refType(int& x) {
 	printf("lvalue reference %d\n", x);
@@ -239,14 +239,14 @@ void refType(int& x) {
 ```
 
 ### RValue Reference
-```cpp
+```c++
 void refType(int&& x) {
 	printf("rvalue reference %d\n", x);
 }
 ```
 
 ### Sample Code:
-```cpp
+```c++
 int main() {
 	auto x = 1;
 	refType(x); // lvalue
@@ -258,7 +258,7 @@ int main() {
 ## std::move
 `std::move` allows you to cast an lvalue type to rvalue type
 
-```cpp
+```c++
 #include <utility>
 /*...*/
 refType(std::move(x));
@@ -267,7 +267,7 @@ refType(std::move(x));
 You should not use moved-from objects except to reassign or destruct them.
 
 We can use this knowledge to improve our Hero Constructor. We add a new RValue Reference Constructor:
-```cpp
+```c++
     Hero(String&& name) :
 	_name{ std::move(name) } {  // tell the compiler, that `name` can safely be moved
 	} // String (empty) gets deconstructed
@@ -277,7 +277,7 @@ We can use this knowledge to improve our Hero Constructor. We add a new RValue R
 
 But we also need to define a Move Constructor in our String class. Else, the compiler won't know, how to move our class and create copies instead:
 
-```cpp
+```c++
 String(String&& other) noexcept { // noexcept is necessary, because else the compiler will prefer using the String& constructor
 	printf("Moving %s\n", other.buffer);
 	// move all arguments from the other string to this string
@@ -288,7 +288,7 @@ String(String&& other) noexcept { // noexcept is necessary, because else the com
 
 Don't forget to add null checks in the String's destructor now:
 
-```cpp
+```c++
 ~String(){
 	// ...
 	if(buffer) delete[] buffer;
@@ -318,7 +318,7 @@ But Zeus is an LValue
 
 But we can convert it using `std::move`:
 
-```cpp
+```c++
 int main() {
 	// we know, that we don't use zeusName after the constructor anymore.
     String zeusName{ "Zeus", 100 };
@@ -346,7 +346,7 @@ move: Hercules  // -------- FIXED: deep copy: hercules
 ## Move Assignment
 Furthermore, you should define the move assignment operator, for cases like the following:
 
-```cpp
+```c++
 	String zeus{"Zeus", 7};
 	String hercules{"Hercules", 7}; // here, hercules gets constructed
 	// moves value from zeus to hercules using move assignment operator:
@@ -356,7 +356,7 @@ Furthermore, you should define the move assignment operator, for cases like the 
 ```
 
 This is how to:
-```cpp
+```c++
 String& operator=(String&& other) noexcept { //noexcept is needed again
 	if(this == other) return *this;
 	// clean up own values
@@ -381,7 +381,7 @@ If you define any of these
 
 You can explicitly ask the compiler to generate some of these methods (or not):
 
-```cpp
+```c++
 String(String&& other) noexcept = default; // explicitly ask for default generated method
 String(String& other) = delete; // explicitly remove generation
 ```

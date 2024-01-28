@@ -5,7 +5,7 @@ Similar to Generics in C#
 
 ### Defining a Template Class
 
-```cpp
+```c++
 template<typename THealth>
 struct Player
 {
@@ -20,7 +20,7 @@ struct Player
 
 ### Using a Template Class
 
-```cpp
+```c++
 int main()
 {
 	Player<int> player{10};
@@ -34,7 +34,7 @@ int main()
 
 #### Invalid Type Arguments
 
-```cpp
+```c++
 struct Foo{};
 int main()
 {
@@ -45,7 +45,7 @@ int main()
 
 #### Nested Generics
 
-```cpp
+```c++
 
 <template typename T>
 struct container{
@@ -67,7 +67,7 @@ Every time, you use a template class with different type arguments
 - each copy is an independent class of its own
 - meaning, that `container<int>` and `container<bool>` are two independent classes after compilation:
 
-```cpp
+```c++
 
 template<typename T>
 class container<T>{
@@ -83,7 +83,7 @@ int main(){
 }
 ```
 
-```cpp
+```c++
 // Instantiation with int:
 class container<int> {
     int t;
@@ -103,7 +103,7 @@ public:
 
 Force Compiler to instantiate Template with given parameters
 
-```cpp
+```c++
 // force instantiation with float
 template class container<float>;
 ```
@@ -118,7 +118,7 @@ Not compiled like ordinary code
 Template code in `cpp` file can only be used within that file
   - otherwise linker error
 
-```cpp
+```c++
 // Player.h
 #pragma once
 
@@ -132,14 +132,14 @@ struct Player
 };
 ```
 
-```cpp
+```c++
 // Player.cpp
 #include "Player.h"
 template<typename THealth>
 void Player<THealth>::bar(){}
 ```
 
-```cpp
+```c++
 // Game.cpp
 #include "Player.h"
 
@@ -152,7 +152,7 @@ int main() {
 
 Can fix above error by forcing template instantiation in Player Header or Cpp File:
 
-```cpp
+```c++
 template struct Player<float>;
 ```
 
@@ -162,7 +162,7 @@ But you'd have to know about all possible type arguments that you might use in t
 
 ### Defining a Template Function
 
-```cpp
+```c++
 template<typename TMessage>
 void PrintMessage(const TMessage& message)
 {
@@ -172,7 +172,7 @@ void PrintMessage(const TMessage& message)
 
 ### Using a Template Function
 
-```cpp
+```c++
 struct ErrorMessage
 {
 	char* ToString() const
@@ -192,7 +192,7 @@ int main()
 
 Can be used to convert a const object to a non-constant one:
 - generally not a good idea!
-```cpp
+```c++
 void TakeDamage(const Unit& attacker, int damage) {
 	Unit& nonConstAttacker = const_cast<Unit&>(attacker);
 	attacker.TakeDamage(*this, 5);
@@ -203,7 +203,7 @@ void TakeDamage(const Unit& attacker, int damage) {
 
 Reverses an implicit conversion
 - a.k.a. down-casting
-```cpp
+```c++
 void Attack(Unit* target){
 	Ghost* ghost = static_cast<Ghost*>(target);
 }
@@ -213,7 +213,7 @@ void Attack(Unit* target){
 
 Allows to reinterpret memory as a different type, e.g. to look at the bytes of a `float`:
 
-```cpp
+```c++
 #include <cstdio>
 
 int main()
@@ -235,7 +235,7 @@ The most powerful casting operator
 - it works similar to C#'s type casting
 - it has no trouble with multiple inheritance:
 
-```cpp
+```c++
 struct IFoo {
     virtual void foo() = 0;
 };
@@ -286,32 +286,32 @@ In that case, the template type arguments do not need to be specified.
 ### Example 1
 
 Given:
-```cpp
+```c++
 int a = 255;
 ```
 
-```cpp
+```c++
 std::byte b = narrow_cast<int, std::byte>(a);
 ```
 
 Can be reduced to:
-```cpp
+```c++
 std::byte b = narrow_cast<std::byte>(a);
 ```
 
 ### Example 2
 
 Given:
-```cpp
+```c++
 int a[]{1,2,3,4,5,6};
 ```
 
-```cpp
+```c++
 int average = average<int>(a/*...*/)
 ```
 
 Can be reduced to:
-```cpp
+```c++
 int average = average(a);
 ```
 
@@ -327,7 +327,7 @@ Advantages:
 
 ### Problem: Type Checking in Templates
 
-```cpp
+```c++
 template<typename T>
 T sqr(T value){
     return value * value;
@@ -356,7 +356,7 @@ Problem: Error messages look cryptic
 
 ### Custom Concepts
 Syntax:
-```cpp
+```c++
 template <typename T, typename U, ...>
 concept concept_name = requires (arg1, arg2, ...) {
     expression -> return_type;
@@ -366,7 +366,7 @@ concept concept_name = requires (arg1, arg2, ...) {
 ```
 
 For example, a concept that validates that a Type can be multiplied with itself:
-```cpp
+```c++
 template <typename T>
 concept multipliable = requires (T a, T b) {
     a*b;
@@ -377,7 +377,7 @@ The expression needs to compile. It is not actually evaluated.
 
 ### Using Concepts as Type Requirements
 Postfix:
-```cpp
+```c++
 template<typename T>
 	requires multipliable<T>
 T square(T a)
@@ -387,7 +387,7 @@ T square(T a)
 ```
 
 Inline:
-```cpp
+```c++
 template<multipliable T>
 T cubed(T a)
 {
@@ -395,7 +395,7 @@ T cubed(T a)
 }
 ```
 
-```cpp
+```c++
 int main()
 {
     int number = 3;
@@ -407,7 +407,7 @@ int main()
 ### Using Concept as Parameter Type Constraint
 
 Postfix:
-```cpp
+```c++
 size_t index_of_max(auto* values, size_t count)
 	requires std::totally_ordered<decltype(values)>
 {
@@ -421,7 +421,7 @@ size_t index_of_max(auto* values, size_t count)
 ```
 
 Inline:
-```cpp
+```c++
 size_t index_of_min(std::totally_ordered auto* values, size_t count)
 {
     size_t min_index{};
@@ -440,7 +440,7 @@ The function specialization with the most specific constraints is chosen.
 In this case, both functions are viable for type `Y`
 - `has_x` is one `concept` that checks for `x`
 - `coord` is one `concept` that checks for `x` and `y`
-```cpp
+```c++
 template <typename T>
 concept has_x = requires (T v) {
     v.x;
@@ -477,7 +477,7 @@ Here, `coord` uses the `has_x` concept in its definition:
   - and one that checks for `y`
 
 It is therefore more specialized than `has_x`
-```cpp
+```c++
 template <typename T>
 concept has_x = requires (T v) {
     v.x;
@@ -503,7 +503,7 @@ int main() {
 
 ### EXERCISE: BUILD AN AVERAGEABLE CONCEPT AND USE IT
 Template:
-```cpp
+```c++
 template<typename T>
 concept bool Averageable = std::something_with_default_constructible_v<T>
         && requires (T a, T b) {
@@ -516,7 +516,7 @@ concept bool Averageable = std::something_with_default_constructible_v<T>
 - gets evaluated at compile time
 - throws compile errors if invalid
 
-```cpp
+```c++
 // validate during compile-time that integral division rounds towards zero:
 static_assert(-5 / 2 == -2);
 ```
@@ -526,7 +526,7 @@ You can use Non-Type Template Arguments
 - you can then pass constant values as template arguments
 
 The following program uses this technique for compile-time validated array access:
-```cpp
+```c++
 #include <cstdio>
 
 template <size_t Index, typename T, size_t Length>
@@ -547,7 +547,7 @@ int main()
 
 ### Example: Array Size Checking Through Templates
 
-```cpp
+```c++
 #include <cstdio>
 
 template<size_t N>
@@ -567,7 +567,7 @@ int main()
 ```
 
 ### Example: GameGrid
-```cpp
+```c++
 template<int cols, int rows>
 class Grid{
     Cell cells[cols][rows];
@@ -577,7 +577,7 @@ class Grid{
 ## Variadic Template
 You can write template functions that take unlimited number of arguments:
 
-```cpp
+```c++
 // C++ program to demonstrate working of
 // Variadic function Template
 #include <iostream>
@@ -605,7 +605,7 @@ You can specialize template classes and functions for specific arguments
   - which would only for int arguments also round the result
 - similar to function overloading
 
-```cpp
+```c++
 #include <iostream>
 using namespace std;
  
@@ -634,7 +634,7 @@ int main()
 ## Template Instantiation
 It's interesting to know, when and why templates get instantiated and how to control it explicitly.
 
-```cpp
+```c++
 template struct container<int>;
 ```
 
@@ -645,7 +645,7 @@ Depending on whether a template function depends on the template argument or not
 - the moment the template is instantiated
   - if it does depend on the argument
 
-```cpp
+```c++
 #include <iostream>
 using namespace std;
 
@@ -683,7 +683,7 @@ It is proven that Template Meta-Programming is Turing-Complete
 - i.e. any computation expressible by a computer program can be computed by a template meta-program
 
 This is a template that calculates, whether a number is a prime number:
-```cpp
+```c++
 #include <iostream>
 using namespace std;
 

@@ -8,7 +8,7 @@ Whenever we pass a value from a to b
 The problem is: Some objects might contain references (pointers) to other objects
 - e.g. the Monster carries an Item
 
-```cpp
+```c++
 class Monster {
    Item* item;
 };
@@ -18,13 +18,13 @@ Monster original{new Item{}}; // Monster #1 carries Item #1
 
 Now, if you copy the Monster, the Monster will be copied, but the Item will still be the same:
 
-```cpp
+```c++
 Monster clone = original; // Monster #2 carries Item #1 as well!
 ```
 
 This can lead to problems, e.g. if Monster b gets destructed:
 
-```cpp
+```c++
 class Monster {
   ~Monster(){ delete item; } // Monster deletes its item on death
 };
@@ -48,7 +48,7 @@ After copying `a` to `b` they should be
 
 ## Copying Values
 Values are constantly copied whenever you assign them to another variable or a function parameter:
-```cpp
+```c++
 int foo(int input){
 	int result = input+1; // copying (input+1) into result
 	return result;
@@ -64,7 +64,7 @@ e = a; // Copy Assignment: a into e
 
 ## Copying Base Data Types
 No surprises here, we know, how this works:
-```cpp
+```c++
 int increase(int number){
 	number++;
 	return number;
@@ -82,7 +82,7 @@ Member-wise copy
 - each member value is copied into the parameter
 - effectively it's a bitwise copy from one address to another
 
-```cpp
+```c++
 struct Vector2 {
 	int x,y;
 };
@@ -104,7 +104,7 @@ int main() {
 - what happens, when your String class gets copied?
 - what happens, when one instance gets deallocated?
 
-```cpp
+```c++
 int main() {
 	String a{"Hello", 7};
 	a.Print(); // a is fine
@@ -135,7 +135,7 @@ PROBLEM
 ### Copy Constructor
 To fix this, we need more control over what happens, when one String gets copied to another.
 
-```cpp
+```c++
 String(const String& other){
 	/*...*/
 }
@@ -144,7 +144,7 @@ String(const String& other){
 Invoked When:
 - copying into an uninitialized object
 
-```cpp
+```c++
 String a{"Hello", 7};
 String b = a; // copy constructor, because b gets constructed wit the value of a
 ```
@@ -157,7 +157,7 @@ There are two ways of copying members:
 
 This is needed, if e.g. you want to clone an Enemy which has a reference to the Player. You don't want to clone the player, then, right?
 
-```cpp
+```c++
 Player* target;
 
 Enemy(const Enemy& other){
@@ -174,7 +174,7 @@ Enemy(const Enemy& other){
 
 This is needed e.g. when each unit has a Weapon and you want both the copied Unit to have a copy of the item, not share the same instance (An Item can't be in two places at the same time, right?)
 
-```cpp
+```c++
 Item* item;
 
 Enemy(const Enemy& other){
@@ -186,7 +186,7 @@ Enemy(const Enemy& other){
 ### Copy Assignment
 Unfortunately, that's not all. There's also a Copy Assignment Operator:
 
-```cpp
+```c++
 String& operator=(const String& other) {
 	if (this == &other) return *this; // performance benefit if `a = a`
 	// first, clean up this object, e.g. delete existing Items, Buffers, etc.
@@ -198,7 +198,7 @@ String& operator=(const String& other) {
 Invoked When:
 - copying into already initialized object
 
-```cpp
+```c++
 String a{"Hello", 7};
 String b{"World", 9}; // b is initialized
 b = a; // Copy Assignment, because b has already been initialized
@@ -206,7 +206,7 @@ b = a; // Copy Assignment, because b has already been initialized
 
 This time, you need to ensure to clean up all objects that you deep copied:
 
-```cpp
+```c++
 Item* item;
 
 Enemy& operator=(const Enemy& other) {
@@ -218,7 +218,7 @@ Enemy& operator=(const Enemy& other) {
 
 But beware, this doesn't go for shallow copied objects:
 
-```cpp
+```c++
 Player* target;
 
 Enemy& operator=(const Enemy& other) {
@@ -230,7 +230,7 @@ Enemy& operator=(const Enemy& other) {
 
 ### Default Copy
 Why does the following code work, even though we haven't defined a copy constructor or assignment operator?
-```cpp
+```c++
 struct Vector2{
 	int x,y;
 };
@@ -248,7 +248,7 @@ The compiler generates default implementations for copy construction anc copy as
 To make your intention obvious
 - explicitly define that you want to use default implementations
 
-```cpp
+```c++
 struct Vector2{
 	int x,y;
 	Vector2(const Vector2&) = default;
@@ -261,7 +261,7 @@ Some classes, you never want to be copied
 - e.g. a GameGrid which takes up a lot of Memory
 - mark the copy constructor and assignment operator as `delete`
 
-```cpp
+```c++
 struct GameGrid {
 	GameGrid(const GameGrid&) = delete;
 	GameGrid& operator=(const GameGrid&) = delete;
@@ -270,7 +270,7 @@ struct GameGrid {
 
 It will generate compile errors when trying to copy your class:
 
-```cpp
+```c++
 GameGrid a;
 GameGrid b = a; // Compile Error
 ```

@@ -13,7 +13,7 @@ Functions will be inlined.
 - and instead have the code included in whatever file the method is used
 - advantage: high performance
 - duplicate: a lot of duplicate code in the binary
-```cpp
+```c++
 // Circle.h
 class Circle{
 	float radius;
@@ -30,7 +30,7 @@ Functions and data member declaration in header
 - source file must include matching header file
   - but can use short names inside the function code
 
-```cpp
+```c++
 // Circle.h
 class Circle{
 	float radius;
@@ -41,7 +41,7 @@ public:
 };
 ```
 
-```cpp
+```c++
 // Circle.cpp
 #include "circle.h"
 Circle::Circle() {
@@ -61,7 +61,7 @@ Functions inlined, but defined outside of the class body
 - must use `inline` keyword
 - must use fully qualified function names
 
-```cpp
+```c++
 // Circle.h
 class Circle{
 	float radius;
@@ -81,7 +81,7 @@ Put definition into inline files (e.g. `*.inl` there is no standard defined)
 - keeps header completely clean
 - header must include inline file
 
-```cpp
+```c++
 // Circle.h
 class Circle{
 	float radius;
@@ -94,7 +94,7 @@ class Circle{
 #include "circle.inl"
 ```
 
-```cpp
+```c++
 // Circle.inl
 inline Circle::Circle() : radius{0} {}
 inline Circle::Circle(float r) : radius{r} {}
@@ -114,7 +114,7 @@ inline float GetRadius() const { return radius; }
 - sometimes necessary when two classes depend on each other
   - because bi-directional include doesn't work!
 
-```cpp
+```c++
 #include "Mouse.h"
 
 class Cat{
@@ -122,7 +122,7 @@ class Cat{
 };
 ```
 
-```cpp
+```c++
 #include "Cat.h"
 
 class Mouse{
@@ -136,7 +136,7 @@ class Mouse{
 - not sufficient if you need to use value members
   - because byte layout of the type is not known, then
 
-```cpp
+```c++
 class Mouse;
 
 class Cat{
@@ -156,7 +156,7 @@ Use Forward Declarations whenever possible
 ## Friend Classes
 Grants friend class access to private members
 - use it scarcely (circumvents encapsulation)
-```cpp
+```c++
 class A{
 	friend class B;
 	void privateFunction(){}
@@ -170,7 +170,7 @@ class B{
 
 ## Friend Functions
 Same as above, but with functions
-```cpp
+```c++
 class A{
 	friend void foo();
 	void privateFunction(){}

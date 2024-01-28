@@ -1,11 +1,11 @@
-# 7 Const
+# Const
 - short for "constant"
 - i.e. "cannot be modified"
 - gives compiler errors if violated
 
 ## Const Arguments
 
-```cpp
+```c++
 #include <cstdio>
 void printButDoNotModify(const char* name){
 	printf("%s", name);
@@ -22,7 +22,7 @@ int main() {
 
 The following code won't compile:
 
-```cpp
+```c++
 class DateTime {
 	int year{1990};
 public:
@@ -53,7 +53,7 @@ Reason is, that only `const` methods can be invoked on `const` variables.
 
 ### Definition
 
-```cpp
+```c++
 int getYear() const {
 	return year;
 }
@@ -61,7 +61,7 @@ int getYear() const {
 
 ### Usage
 
-```cpp
+```c++
 int getYear() const {
 	return ++year; // Won't compile - error: cannot assign to non-static data member within const member function 'getYear'
 }
@@ -69,7 +69,7 @@ int getYear() const {
 
 ## Const Members
 
-```cpp
+```c++
 struct Unit {
 	const int maxLevel = 100;
 	DateTime birthDate;
@@ -78,7 +78,7 @@ struct Unit {
 
 ### Initializer List
 
-```cpp
+```c++
 #include <cstdio>
 class DateTime {
 	int year{1990};
@@ -118,7 +118,7 @@ int main(){
   - access counters
   - caching
 
-  ```cpp
+  ```c++
   class Circle {
 	mutable int accessCounter;
 	float radius;
@@ -137,7 +137,7 @@ Tells the program that a variable may change outside the context of a program
 Used for:
 - memory-mapped hardware ports
 - memory shared between threads/processes
-```cpp
+```c++
 volatile int i;
 ```
 

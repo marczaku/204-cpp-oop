@@ -3,7 +3,7 @@ Here, we will learn, how to define custom operators for your classes in C++.
 
 The advantage is, that it makes code a lot more readable. Instead of:
 
-```cpp
+```c++
 Vector position{12, 12, 12};
 Vector right{1, 0, 0};
 
@@ -11,7 +11,7 @@ position = position.Add(right.MultiplyWith(2));
 ```
 
 You can then write:
-```cpp
+```c++
 position += right * 2;
 ```
 
@@ -27,7 +27,7 @@ There is two ways of defining custom operators:
 
 ### Class Member Operator
 
-```cpp
+```c++
 class Vector{
 	float x, y, z;
 public:
@@ -41,7 +41,7 @@ public:
 ### Global Operator
 Advantage: The first parameter can be non-class type!
 - or a class that you haven't written yourself
-```cpp
+```c++
 class Vector{
 	float x,y,z;
 	// often, the operator needs access to private members. Use `friend` keyword:
@@ -60,7 +60,7 @@ This is necessary due to chaining like here:
 
 `(a+=b) += c;`
 
-```cpp
+```c++
 X& operator+=(const X& rhs)
 {
 	/* addition of rhs to *this takes place here */
@@ -72,7 +72,7 @@ X& operator+=(const X& rhs)
 How is `++x` and `x++` distinguished?
 
 Prefix:
-```cpp
+```c++
 X& operator++()
 {
 	// actual increment takes place here
@@ -81,7 +81,7 @@ X& operator++()
 ```
  
 Postfix:
-```cpp
+```c++
 X operator++(int)
 {
 	X old = *this; // copy old value
@@ -94,35 +94,35 @@ X operator++(int)
 Often, one operator implementation can be used for the implementation of the others:
 
 If you define:
-```cpp
+```c++
 inline bool operator< (const X& lhs, const X& rhs) { /* do actual comparison */ }
 ```
 
 You can define the others as such:
-```cpp
+```c++
 inline bool operator> (const X& lhs, const X& rhs) { return rhs < lhs; }
 inline bool operator<=(const X& lhs, const X& rhs) { return !(lhs > rhs); }
 inline bool operator>=(const X& lhs, const X& rhs) { return !(lhs < rhs); }
 ```
 
 Also, if you define:
-```cpp
+```c++
 inline bool operator==(const X& lhs, const X& rhs) { /* do actual comparison */ }
 ```
 You can use it:
-```cpp
+```c++
 inline bool operator!=(const X& lhs, const X& rhs) { return !(lhs == rhs); }
 ```
 
 Since, C++20 there is even a Three-Way Comparison Operator that can be be used to implicitly define all other comparison operators:
 
-```cpp
+```c++
 friend auto operator<=>(const X&, const X&) = default;
 ```
 
 ## Cast Operator
 Can be used to implicitly convert one type to another:
-```cpp
+```c++
 class Timer{
 	int time;
 public:
@@ -130,14 +130,14 @@ public:
 }
 ```
 
-```cpp
+```c++
 Timer timer;
 int i = timer; // implicit cast through operator
 ```
 
 ### Automatic Type Conversion
 The Compiler can perform implicit, automatic type conversions:
-```cpp
+```c++
 class Player {
     const char* name;
 public:
@@ -152,17 +152,17 @@ int main() {
 
 This is often not desired and can be prevented by the `explicit` keyword:
 
-```cpp
+```c++
 explicit Player(const char* name) : name{ name } {}
 ```
 
 This now fixes:
-```cpp
+```c++
     Player player = name; // COMPILE ERROR
 ```
 
 But allows using the constructor explicitly:
-```cpp
+```c++
 	Player player{name};
 }
 ```
@@ -193,13 +193,13 @@ Insertion and Extraction (Streaming):
 `<<` `>>` `>>=` `<<=`
 - especially used for c++'s version of C#'s `ToString()`:
 
-```cpp
+```c++
 ostream& operator << (ostream &os, const Student &s) {
     return (os << "Name: " << s.name << "\n Age: " << s.age << "\n Final Grade: " << s.finalGrade  << std::endl);
 }
 ```
 
-```cpp
+```c++
 Student student{"Marc", 32, 1};
 std::cout << student;
 ```
@@ -222,7 +222,7 @@ Member Access Operator
 - imagine a class called `Box` that can contain an `Item`
 - you could overload the operator, so you could do:
 
-```cpp
+```c++
 Box box{};
 box.put(Item{}); // put item in the box
 box.get().Use(); // you can now access the item through the box
