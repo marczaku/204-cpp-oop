@@ -2,19 +2,18 @@
 
 In this course, will dive into Object-Oriented Programming, which allows you to apply all learnt principles of C# to C++ as well.
 
+For all these functions, DO NOT USE:
+- the standard C String-Functions like `str_cmp()`, `str_cpy()` etc.
+- the C++ String Class `string`
+
 ## Passing Criteria
 Fully implement the String Class described in 1-classes including:
 - copy and move constructors
 - operators
 
-
 ## Excellent Criteria
 - Fulfil all Passing Criteria
-- Implement the Dynamic Array described in 3-classes-and-files
-  - including compile-time polymorphism
-
-## Bonus Criteria
-Implement the following String Functions as well:
+- Implement the following String Functions as well:
 
 ### Automatic resizing of the buffer
 
@@ -54,3 +53,7 @@ a.print(); // HeTTo WorTd
 a.replace("HeTTo", "Bye");
 a.print(); // Bye WorTd
 ```
+
+## Bonus Criteria
+- Implement the Dynamic Array described in 3-classes-and-files
+  - including compile-time polymorphism
