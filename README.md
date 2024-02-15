@@ -10,6 +10,7 @@ For all these functions, DO NOT USE:
 Fully implement the String Class described in 1-classes including:
 - copy and move constructors
 - operators
+- unit tests
 
 ## Excellent Criteria
 - Fulfil all Passing Criteria
