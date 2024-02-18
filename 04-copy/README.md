@@ -1,5 +1,22 @@
 # 4 Copy
 
+```c++
+class Enemy {
+    Item* item;
+    
+    // define a copy constructor in which the item gets cloned
+    Enemy(const Enemy& other) : Item{new Item{other.item}} { }
+    
+    // define a copy assignment operator
+    Enemy& operator=(const Enemy& other) {
+        if (this == &other) return *this; // performance benefit if `a = a`
+        delete item; // delete our old item
+        item = new Item{other.item}; // assign a copy of the other's item
+        return *this;
+    }
+};
+```
+
 ## Introduction
 
 Whenever we pass a value from a to b
@@ -204,6 +221,8 @@ String b{"World", 9}; // b is initialized
 b = a; // Copy Assignment, because b has already been initialized
 ```
 
+#### Deep Copy
+
 This time, you need to ensure to clean up all objects that you deep copied:
 
 ```c++
@@ -215,6 +234,8 @@ Enemy& operator=(const Enemy& other) {
 	this.item = new Item{other.item}; // now, copy the other item and use it
 }
 ```
+
+#### Shallow Copy
 
 But beware, this doesn't go for shallow copied objects:
 
@@ -285,3 +306,69 @@ Further changes to the copy should not affect the original and vice versa.
 
 ### Equivalence
 The original and the copy should have equal values.
+
+
+# Quiz
+
+What is the primary problem with shallow copying in C++ classes?
+- A) It leads to excessive memory usage.
+- B) It results in slower performance due to deep copying.
+- C) It causes objects to share the same memory address.
+- D) It prevents objects from being copied entirely.
+
+What is the primary difference between shallow copy and deep copy in C++?
+- A) Shallow copy copies the object's value, while deep copy copies the object's memory address.
+- B) Shallow copy copies only the object's pointers, while deep copy clones all referenced objects.
+- C) Shallow copy creates a new instance of the object, while deep copy updates the existing instance.
+- D) Shallow copy is used for simple data types, while deep copy is used for complex data structures.
+
+What are the requirements for copy semantics in C++?
+- A) Objects should be identical but may be dependent.
+- B) Objects should be equivalent and independent.
+- C) Objects should share the same memory address.
+- D) Objects should have different values but share resources.
+
+How are values copied in C++ when passed to functions or assigned to variables?
+- A) By creating a new instance of the value.
+- B) By copying only the memory address.
+- C) By using shallow copy semantics.
+- D) By performing a bitwise copy of the value.
+
+What happens when a Plain Old Data (POD) type is passed to a function in C++?
+- A) The entire object is copied, including its memory address.
+- B) Only the object's size is copied, not its contents.
+- C) Each member value is copied into the function parameter.
+- D) The object's pointer is copied, not its data.
+
+What happens when a fully-featured class with dynamic memory allocation is copied in C++?
+- A) The object's memory address is shared between the original and the copy.
+- B) Both the original and the copy point to the same dynamically allocated memory.
+- C) The copy constructor allocates new memory for each member of the copy.
+- D) The copy constructor performs a bitwise copy of the original object.
+
+What is the purpose of a copy constructor in C++?
+- A) To initialize a new object using an existing object.
+- B) To assign values from one object to another object.
+- C) To delete the original object after copying its values.
+- D) To compare two objects for equality. 
+
+When is the copy constructor invoked in C++?
+- A) When creating a new object without specifying initial values.
+- B) When copying an uninitialized object to an initialized object.
+- C) When copying an already initialized object to an uninitialized object.
+- D) When deleting an object after its scope ends.
+
+What is the primary purpose of the copy assignment operator in C++?
+- A) To initialize a new object using an existing object.
+- B) To assign values from one object to another object.
+- C) To delete the original object after copying its values.
+- D) To compare two objects for equality.
+
+What happens if a class's copy constructor and copy assignment operator are not explicitly defined in C++?
+- A) The compiler generates default implementations for both.
+- B) The class cannot be copied to another object.
+- C) The class automatically performs deep copying for all members.
+- D) The class automatically performs shallow copying for all members.
+
+# Exercise
+- Implement Copy Semantics into your `String` class

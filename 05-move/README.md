@@ -1,5 +1,32 @@
-# Move
-In this chapter, we will learn about special situations in programming in which copying a value (which costs extra performance) can be replaced by moving a value instead.
+# 5 Move
+
+```c++
+class Enemy {
+    Item* item;
+
+    // define a move constructor in which we move the item from other to us
+    Enemy(const Enemy&& other) noexcept : Item{std::move{other.item}} { }
+    
+    // define a copy assignment operator
+    Enemy& operator=(const Enemy&& other) {
+        if (this == &other) return *this; // performance benefit if `a = a`
+        delete item; // delete our old item
+        item = std::move{other.item} // now move the other's item to us
+        return *this;
+    }
+};
+```
+
+```c++
+Enemy registeredEnemy;
+// make a function that accepts a rvalue reference enemy
+void registerSpawnedEnemy(Enemy&& enemy) {
+    // move the enemy instead of copying them
+   registeredEnemy = std::move(enemy);
+}
+```
+
+In this chapter, we will learn about special situations in programming in which copying a value (which may consume a lot of resources in case of deep copies) can be avoided by moving a value instead.
 
 We will learn:
 - when the compiler can find out on its own, that a value can be moved
@@ -13,6 +40,8 @@ We will learn:
   - moving all the information from `a` to `b`
   - to further use `b`
   - and not use `a` anymore
+
+## An extreme example
 
 ```c++
 int main() {
@@ -47,9 +76,15 @@ Deep Copy String(const String& "Odysseus")
 ~String:"Prometheus"
 ```
 
-That's a lot of resources wasted!
+We are creating:
+- 4 Hercules instances
+- 3 Odysseus instances
+- 2 Prometheus instances
 
-## Simpler Sample
+That's a lot of resources wasted!
+- We only needed one copy of each
+
+## A simpler example
 Above Code is quite complex and understanding exactly how `vector::push_back` works is not so easy, so here's a simpler code snippet to continue with:
 
 ```c++
@@ -92,16 +127,16 @@ We have multiple issues in above code:
 
 Here, the `String` gets copied when it gets passed as an Argument to he Hero-Constructor
 
-### Copy to Class Field
+### Copy to Class Data Member
 
 ```c++
     Hero(String name) :
-	_name{ name } {  // deep copy string: Zeus from name -> _name
+	    _name{ name } {  // deep copy string: Zeus from name -> _name
 
 	} // String Zeus(name) gets deconstructed
 ```
 
-Here, the `String`-Argument `name` gets copied when it gets assigned to the Hero's Field `_name`
+Here, the `String`-Argument `name` gets copied when it gets assigned to the Hero's Member Variable `_name`
 
 When the Constructor ends, the `name` Argument is not used anymore and gets Destructed.
 
@@ -113,7 +148,7 @@ Hero hercules{ String{ "Hercules", 100 } };
 
 In the case of Hercules, no copy is created when the Hero-Constructor is invoked. This is because the Variable gets directly constructed at the right address of the argument. Cool!
 
-### Copy to Class Field (Again)
+### Copy to Class Member Variable (Again)
 
 ```c++
     Hero(String name) :
@@ -124,8 +159,12 @@ In the case of Hercules, no copy is created when the Hero-Constructor is invoked
 
 But the problem within the Hero Constructor still exists.
 
+
+
 ## Use Reference For Constructor Argument
-First of all, we should use a reference as a constructor Argument. There is no need that the argument gets cloned when passed as a constructor argument, if it gets cloned when being assigned to the member variable anyways:
+First of all, we should use a reference as a constructor Argument.
+- There is no need that the argument gets cloned when passed as a constructor argument
+- if it gets cloned when being assigned to the member variable anyways:
 
 ```c++
     Hero(const String& name) :
@@ -157,12 +196,12 @@ deep copy: Hercules
 Idea: Within the Hero's Constructor, we know, that the `name` value is used for nothing else but for assigning it to `_name`, so how about we use that knowledge and tell c++ to:
 - not create a deep copy of the String and its Buffer
 - but instead:
-  - move the buffer from the argument to the field
+  - move the buffer from the argument to the member variable
   - set the buffer on the argument to null
-- and then, when the argument gets destructed, it won't destroy the field's buffer
+- and then, when the argument gets destructed, it won't destroy the member variable's buffer
 
 ## Value Categories
-There is many value types:
+There are many value types:
 ```
      expression
      /        \
@@ -177,7 +216,10 @@ Generally, you can group the values by:
 
 ### LValue
 
-`lvalue`: a value with an identity, a variable. It usually can't be moved, because you might want to continue using the original value:
+`lvalue`: a value with an identity, a variable
+- Named so, because it can stand on the left side of an assignment
+- Usually can't be moved
+- because you might want to continue using the original value:
 
 ```c++
 String zeusName{"Zeus", 7}; // zeusName is an lvalue
@@ -197,7 +239,7 @@ String{"Zeus", 7}; // this is a pr value
 
 String zeusName = String{"Zeus", 7};
 Hero{String{"Zeus", 7}};
-String{"Zeus", 7} = zeusName; // not possible
+// String{"Zeus", 7} = zeusName; // not possible
 
 5; // this one also is a pr value
 5 = i; // also not possible
@@ -205,7 +247,10 @@ String{"Zeus", 7} = zeusName; // not possible
 
 ### XValue
 
-`xvalue`: these are more problematic. These are values that can be moved, even though they have an identity. The Compiler can't be sure, whether the value can be moved or not, so we need to specify it:
+`xvalue`: these are more problematic
+- These are values that can be moved, even though they have an identity
+- The Compiler can't be sure, whether the value can be moved or not
+- so we need to specify it:
 
 ```c++
 Hero zeus{};
@@ -232,16 +277,16 @@ When we define reference arguments, there is two ways of defining them:
 
 ### LValue Reference
 ```c++
-#include <cstdio>
+#include <iostream>
 void refType(int& x) {
-	printf("lvalue reference %d\n", x);
+	cout << "lvalue reference " << x << "\n";
 }
 ```
 
 ### RValue Reference
 ```c++
 void refType(int&& x) {
-	printf("rvalue reference %d\n", x);
+	cout << "rvalue reference " << x << "\n";
 }
 ```
 
@@ -268,8 +313,8 @@ You should not use moved-from objects except to reassign or destruct them.
 
 We can use this knowledge to improve our Hero Constructor. We add a new RValue Reference Constructor:
 ```c++
-    Hero(String&& name) :
-	_name{ std::move(name) } {  // tell the compiler, that `name` can safely be moved
+    Hero(String&& name) noxexcept :
+	    _name{ std::move(name) } {  // tell the compiler, that `name` can be safely moved
 	} // String (empty) gets deconstructed
 ```
 
@@ -385,3 +430,39 @@ You can explicitly ask the compiler to generate some of these methods (or not):
 String(String&& other) noexcept = default; // explicitly ask for default generated method
 String(String& other) = delete; // explicitly remove generation
 ```
+
+
+# Quiz
+
+What is the purpose of move semantics in C++?
+- A) To copy values efficiently
+- B) To move values instead of copying, saving resources
+- C) To ensure deep copying of values
+- D) To prevent copying of values
+
+Which type of value can stand on the left side of an assignment and usually cannot be moved?
+- A) LValue
+- B) RValue
+- C) Prvalue
+- D) XValue
+
+What does `std::move` allow you to do in C++?
+- A) Create a new instance of a value
+- B) Prevent copying of values
+- C) Move an LValue to an RValue
+- D) Convert an LValue to an RValue, allowing it to be moved
+
+When defining a move constructor or move assignment operator, why is `noexcept` often used?
+- A) To indicate that the operation may throw exceptions
+- B) To ensure that the operation does not throw exceptions
+- C) To explicitly allow exceptions to be thrown
+- D) To prevent the compiler from generating default methods
+
+What happens if you don't define any of the special member functions (destructor, copy constructor, move constructor, copy assignment operator, move assignment operator) in a C++ class?
+- A) All of these will be implicitly generated by the compiler
+- B) None of these will be generated by the compiler
+- C) Only the destructor will be generated by the compiler
+- D) Only the copy constructor and copy assignment operator will be generated by the compiler
+
+# Exercises
+- Implement Move Semantics into your `String` class

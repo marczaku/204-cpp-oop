@@ -1,7 +1,8 @@
-# 5 Operators
+# 6 Operators
 Here, we will learn, how to define custom operators for your classes in C++.
+- The advantage is, that it makes code a lot more readable. 
 
-The advantage is, that it makes code a lot more readable. Instead of:
+Instead of:
 
 ```c++
 Vector position{12, 12, 12};
@@ -26,7 +27,7 @@ There is two ways of defining custom operators:
   - e.g. `Vector operator+(Vector a, Vector b)`
 
 ### Class Member Operator
-
+Advantage: Convenient to implement
 ```c++
 class Vector{
 	float x, y, z;
@@ -82,6 +83,7 @@ X& operator++()
  
 Postfix:
 ```c++
+// unnecessary int argument just used to distinguish one from another
 X operator++(int)
 {
 	X old = *this; // copy old value
@@ -168,29 +170,29 @@ But allows using the constructor explicitly:
 ```
 
 ## List of Operators:
-Unary:
-`+` `-` `++` `--`
+Unary Arithmetic:
+- `+` `-` `++` `--`
 
 Binary Arithmetic:
-`+` `-` `*` `/` `%`
+- `+` `-` `*` `/` `%`
 
 Binary Bitwise:
-`^` `&` `|` `~`
+- `^` `&` `|` `~`
 
-Unary Logical:
-`!` `&&` `||`
+Unary & Binary Logical:
+- `!` `&&` `||`
 
 Assignment:
-`=`
+- `=`
 
 Comparison:
-`<` `>` `==` `!=` `<=` `>=` `<=>`
+- `<` `>` `==` `!=` `<=` `>=` `<=>`
 
 Compound:
-`+=` `-=` `*=` `/=` `%=` `^=` `&=` `|=`
+- `+=` `-=` `*=` `/=` `%=` `^=` `&=` `|=`
 
 Insertion and Extraction (Streaming):
-`<<` `>>` `>>=` `<<=`
+- `<<` `>>` `>>=` `<<=`
 - especially used for c++'s version of C#'s `ToString()`:
 
 ```c++
@@ -235,7 +237,72 @@ Member Access through Pointer Operator
   - not recommended to overload
   - because it makes normal member access on pointer types difficult
 
-## EXERCISE: VECTOR CLASS
+# Quiz
+
+Which of the following is NOT an advantage of defining custom operators for classes in C++?
+- a) Improved code readability
+- b) Enhanced performance
+- c) Increased convenience
+- d) More natural syntax
+
+How is a class member operator typically defined?
+- a) As a static member function
+- b) As a global function
+- c) As a non-member function
+- d) As a member function
+
+What keyword is used to grant access to private members in a global operator function?
+- a) `public`
+- b) `protected`
+- c) `private`
+- d) `friend`
+
+Which operator is used for reference assignment in C++?
+- a) `=`
+- b) `==`
+- c) `+=`
+- d) `*=`
+
+In C++, how is the prefix increment operator implemented?
+- a) `operator++(int)`
+- b) `operator++()`
+- c) `operator--()`
+- d) `operator--(int)`
+
+What is the purpose of the `friend` keyword in C++ class definitions?
+- a) To define a class that does not throw exceptions
+- b) To allow access to private members
+- c) To declare a static member function
+- d) To specify a base class
+
+Which C++ standard introduced the Three-Way Comparison Operator?
+- a) C++98
+- b) C++11
+- c) C++17
+- d) C++20
+
+What is the purpose of the `explicit` keyword in C++ constructors?
+- a) To specify a default argument
+- b) To allow implicit type conversion
+- c) To prevent implicit type conversion
+- d) To declare a virtual function
+
+Which of the following is NOT a unary arithmetic operator in C++?
+- a) `+`
+- b) `-`
+- c) `++`
+- d) `*`
+
+What is the purpose of the Member Access through Pointer Operator `->*` in C++?
+- a) To access public members of a class through a pointer
+- b) To access private members of a class through a pointer
+- c) To access members of a class through a reference
+- d) To access members of a class through a smart pointer
+
+
+# Exercises
+
+## Vector Class
 - geometrical 3d vector
 - vector addition `+`
 - vector subtraction `-`
@@ -248,11 +315,10 @@ Member Access through Pointer Operator
 - compound assignment `+=` `-=` `*=` `/=`
   - `*=` for both products
 - constructors
-- copy-constructor
 - assignment operator `=`
 - move constructor not necessary. Why?
 
-## EXERCISE: IMPROVE STRING CLASS
+# String Class
 Add all operators that make sense.
 
 For example, but not limited to:
@@ -260,4 +326,4 @@ For example, but not limited to:
 - `+=` to append one string to another
 - `[]` to access the string's characters.
 - `<<` for printing the string using `cout`
-- `<` to find out, which string comes alphabetically first
+- Comparison Operators to find out, which string comes alphabetically first
