@@ -29,13 +29,29 @@ Useful for:
 - allowing compiler-optimizations vor variables that never change
 - reducing complexity (no need to debug values that can't change)
 
-## Const Arguments
+## Const Values
+
+```c++
+#include <iostream>
+using namespace std;
+
+int main() {
+	const float pi = 3.14f;
+	
+	cout << pi << "\n";
+	
+	pi = 4; // ERROR
+}
+```
+
+## Const References
 
 ```c++
 #include <iostream>
 void printButDoNotModify(const char* name){
 	cout << name;
 	name[0] = 'K'; // ERROR
+	name = "Marc";
 }
 
 int main() {
