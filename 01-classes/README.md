@@ -61,6 +61,8 @@ int main() {
 
 ## Access Control
 
+![encapsulatio.png](encapsulatio.png)
+
 Structs are `public` per default:
 
 ```c++
@@ -103,6 +105,8 @@ int main() {
 ```
 
 ## Constructors
+
+![constructor.png](constructor.png)
 
 Give you control over how objects are constructed
 - which arguments need to be provided
@@ -180,6 +184,8 @@ Player() : level{5} {}
 
 ## Destructor
 
+![destructor.png](destructor.png)
+
 Function that's called when your object is freed ("destroyed")
 
 Use Cases:
@@ -206,6 +212,9 @@ int main(){
 ```
 
 ## This-Pointer
+
+![this.png](this.png)
+
 Sometimes, you need to access the `current object` from within a method. As in, the object on which the Method is currently being invoked. e.g. when attacking:
 
 ```c++
@@ -272,6 +281,8 @@ int main() {
 ```
 
 ## Static
+
+![static.png](static.png)
 
 Variables and Methods that are not associated with a class instance
 - can not access `this`
