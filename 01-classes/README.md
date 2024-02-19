@@ -61,7 +61,7 @@ int main() {
 
 ## Access Control
 
-![encapsulatio.png](encapsulatio.png)
+![encapsulation.png](encapsulation.png)
 
 Structs are `public` per default:
 
