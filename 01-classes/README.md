@@ -320,53 +320,7 @@ int main() {
 
 # Quiz
 
-What is the purpose of the `static` keyword in C++?
-- A) It indicates that a variable or method is associated with a class instance.
-- B) It specifies that a variable or method can only be accessed within the class.
-- C) It indicates that a variable or method is not associated with a class instance.
-- D) It allows variables and methods to access the this pointer.
-
-Which of the following statements about constructors in C++ is true?
-- A) Constructors cannot have parameters.
-- B) Constructors are called explicitly when an object is destroyed.
-- C) Constructors can be used to initialize object members.
-- D) Constructors cannot be overloaded.
-
-What is the primary use of the `this` pointer in C++?
-- A) To access static member variables.
-- B) To access the object that a class method is invoked on.
-- C) To define constants within a class.
-- D) To create dynamic objects.
-
-Which of the following best describes the purpose of a destructor in C++?
-- A) To initialize object members.
-- B) To allocate memory for an object.
-- C) To perform cleanup tasks when an object is destroyed.
-- D) To define static member variables.
-
-How can you access a static member variable in C++?
-- A) By using the `.` operator on an object of the class.
-- B) By using the `->` operator on a pointer to an object of the class.
-- C) By using the `::` operator with the class name.
-- D) By using the `this` pointer within a class method.
-
-What is the difference between a struct and a class in C++?
-- A) Structs can only have public members, while classes can have private members.
-- B) Classes are private by default, while structs are public by default.
-- C) There is no difference; they can be used interchangeably.
-- D) Structs are used for object-oriented programming, while classes are used for procedural programming.
-
-Which of the following is NOT a recommended way to initialize class members in C++?
-- A) Using a constructor initializer list.
-- B) Using an assignment statement within the constructor body.
-- C) Using a static member function.
-- D) Using a default constructor.
-
-What is the purpose of access control in C++ classes?
-- A) To restrict access to certain members of a class.
-- B) To allow access to all members of a class.
-- C) To define the visibility of a class in different compilation units.
-- D) To define the order of initialization of class members.
+[Link to the Quiz](https://forms.gle/S4QE98xbS2HhZ931A)
 
 # Exercises
 
