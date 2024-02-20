@@ -1,17 +1,28 @@
 # 4 Copy
 
 ```c++
-class Enemy {
+class Player {
     Item* item;
-    
+public:
     // define a copy constructor in which the item gets cloned
-    Enemy(const Enemy& other) : Item{new Item{other.item}} { }
+    Player(const Player& other) {
+        if(other.item)
+            item = new Item(*other.item);
+        else
+            item = nullptr;
+        end if
+    }
     
     // define a copy assignment operator
-    Enemy& operator=(const Enemy& other) {
+    Player& operator=(const Player& other) {
         if (this == &other) return *this; // performance benefit if `a = a`
-        delete item; // delete our old item
-        item = new Item{other.item}; // assign a copy of the other's item
+        if(item) delete item; // delete our old item
+        
+        if(other.item)
+            item = new Item(*other.item);
+        else
+            item = nullptr;
+        end if
         return *this;
     }
 };
@@ -19,51 +30,88 @@ class Enemy {
 
 ## Introduction
 
+![copy-basic.png](copy-basic.png)
+
 Whenever we pass a value from a to b
-- an exact clone of the object should be created
+- an exact clone of the object will be created
+
+
+### Shallow Copying Items
+
+![copy-shallow-item.png](copy-shallow-item.png)
 
 The problem is: Some objects might contain references (pointers) to other objects
-- e.g. the Monster carries an Item
+- e.g. the Player carries an Item
+
 
 ```c++
-class Monster {
+class Player {
    Item* item;
 };
 
-Monster original{new Item{}}; // Monster #1 carries Item #1
+// Player #1 carries Item #1
+Player original{new Item{}}; 
 ```
 
-Now, if you copy the Monster, the Monster will be copied, but the Item will still be the same:
+Now, if you copy the Player, the Player will be copied, but the Item will still be the same:
 
 ```c++
-Monster clone = original; // Monster #2 carries Item #1 as well!
+// Player #2 carries Item #1 as well!
+Player clone = original; 
 ```
 
-This can lead to problems, e.g. if Monster b gets destructed:
+This can lead to problems, e.g. if Player b gets destructed:
 
 ```c++
-class Monster {
-  ~Monster(){ delete item; } // Monster deletes its item on death
+class Player {
+  // Player deletes its item on death
+  ~Player(){ delete item; } 
 };
 
-delete clone; // Monster #2 deletes Item #1
-original.tryAttack(); // Monster #1's Item #1 has now been destroyed :(
+// Player #2 deletes Item #1
+delete clone; 
+// Player #1's Item #1 has now been destroyed :(
+original.tryAttack(); 
 ```
 
 What happened above is what's called a Shallow Copy
 - That is, a copy which copies all Members
 - But if those Members are References, they will still point to the same instance
 
+### Deep Copying Items
+
+![copy-deep-item.png](copy-deep-item.png)
+
 What we need, is a Deep Copy
 - That is, a copy which not only copies all Members
 - But also clones all Members, if those are References (Pointer Types)
+
+### Deep Copying Planets
+
+![copy-deep-planet.png](copy-deep-planet.png)
+
+But we don't always want to deep copy references.
+- e.g. if the Player references the planet he stands on
+
+```c++
+class Player {
+    Planet* standingOn;
+}
+```
+
+### Shallow Copying Planets
+
+![copy-shallow-planet.png](copy-shallow-planet.png)
+
+Instead, in these cases, we want to create a shallow copy.
+- both Players will stand on the same planet
 
 ## Copy Semantics
 After copying `a` to `b` they should be
 - equivalent: `a == b`
 - independent: modifying `a` does not cause a modification of `b`
 
-## Copying Values
+## When are values copied? And How?
 Values are constantly copied whenever you assign them to another variable or a function parameter:
 ```c++
 int foo(int input){
@@ -79,7 +127,7 @@ int e{3};
 e = a; // Copy Assignment: a into e
 ```
 
-## Copying Base Data Types
+### Copying Base Data Types
 No surprises here, we know, how this works:
 ```c++
 int increase(int number){
@@ -94,7 +142,7 @@ int main() {
 }
 ```
 
-## Copying PODs
+### Copying PODs
 Member-wise copy
 - each member value is copied into the parameter
 - effectively it's a bitwise copy from one address to another
@@ -117,43 +165,34 @@ int main() {
 }
 ```
 
-## Copying Fully-Featured Classes
-- what happens, when your String class gets copied?
+### Copying Fully-Featured Classes
+- what happens, when the Player class gets copied?
 - what happens, when one instance gets deallocated?
 
 ```c++
 int main() {
-	String a{"Hello", 7};
-	a.Print(); // a is fine
+	Player a{100, new Item{"Golden Sword"}};
+	std::cout << a.item->name << "\n"; // fine
 	{
-		String b = a;
-		a.Print(); // a is still fine
+		Player b = a;
+	    std::cout << a.item->name << "\n"; // fine
 	}
-	a.Print(); // now, a is broken!! :o
+	std::cout << a.item->name << "\n"; // a broke!
 }
 ```
 
-PROBLEM
-- we construct a
-  - which dynamically allocates a buffer at lets say address `#117 `
-- we copy a to b
-  - this will copy length, maxSize and the pointer to the buffer `#117` from a to b
-  - a -> buffer `#117`
-  - b -> buffer `#117`
-- the scope of b is left
-  - b gets deconstructed
-    - which causes b to destroy its buffer `#117`
-    - even though it is still used by a...
-  - and deallocated
-- now, we print a
-  - but its buffer `#117` got deleted by b
-  - so it prints some random text
+Problem:
+- player a has an item allocated at `ADDRESS_A`
+- player b gets the same address `ADDRESS_A`
+- when player b gets destructed
+  - they destroys their item at `ADDRESS_A`
+- player a's item is now broken
 
-### Copy Constructor
-To fix this, we need more control over what happens, when one String gets copied to another.
+## Copy Constructor
+To fix this, we need more control over what happens, when one Player gets copied to another.
 
 ```c++
-String(const String& other){
+Player(const Player& other){
 	/*...*/
 }
 ```
@@ -162,49 +201,52 @@ Invoked When:
 - copying into an uninitialized object
 
 ```c++
-String a{"Hello", 7};
-String b = a; // copy constructor, because b gets constructed wit the value of a
+Player b = a; // copy constructor, because b gets constructed wit the value of a
 ```
 
 There are two ways of copying members:
 
-#### Shallow Copy
+### Shallow Copy
 - copy pointer address
 - meaning, that both objects will reference the SAME address
 
-This is needed, if e.g. you want to clone an Enemy which has a reference to the Player. You don't want to clone the player, then, right?
+This is needed, if e.g. you want to clone an Player which has a reference to the Planet he stands on. You don't want to clone the Planet, then, right?
 
 ```c++
-Player* target;
+Planet* standsOn;
 
-Enemy(const Enemy& other){
-	// shallow copy, don't want to clone the player as well:
-	this.target = other.target;
+Player(const Player& other){
+	// shallow copy, don't want to clone the Planet as well:
+	this.standsOn = other.standsOn;
 }
 ```
 
-#### Deep Copy
+### Deep Copy
 - look up object at pointer
 - allocate `new` object
 - assign new object pointer
-- copy data from old object to new
+- copy data from old object value to new
 
-This is needed e.g. when each unit has a Weapon and you want both the copied Unit to have a copy of the item, not share the same instance (An Item can't be in two places at the same time, right?)
+This is needed e.g. when each unit has an Item
+- and you want both the copied Unit to have a copy of the item
+- not share the same instance 
+- an Item can't be in two places at the same time
 
 ```c++
 Item* item;
 
-Enemy(const Enemy& other){
+Player(const Player& other){
 	// deep copy. We create a new Item on the HEAP and copy the other item into it:
-	this.item = new Item{other.item};
+	this.item = new Item{*other.item};
 }
 ```
 
 ### Copy Assignment
-Unfortunately, that's not all. There's also a Copy Assignment Operator:
+Unfortunately, that's not all. There's also a Copy Assignment Operator `=`
+- which is invoked when copying into an already constructed object
 
 ```c++
-String& operator=(const String& other) {
+Player& operator=(const Player& other) {
 	if (this == &other) return *this; // performance benefit if `a = a`
 	// first, clean up this object, e.g. delete existing Items, Buffers, etc.
 	// then, clone the other object, e.g. copy their Items, Buffers etc.
@@ -212,44 +254,60 @@ String& operator=(const String& other) {
 }
 ```
 
-Invoked When:
-- copying into already initialized object
+Why is the Return Type `String&`?
+- Same question as what's the difference between
+  - `a = b = c;`
+  - `(a = b) = c;`
+
+Why does it return `*this`?
+- The Type of `this` is `Player*`
+- And we need a value type to get its reference `&`:
 
 ```c++
-String a{"Hello", 7};
-String b{"World", 9}; // b is initialized
+Player one{};
+Player* addressOfOne = &one;
+
+Player& referenceToOne = one;
+Player& alsoRefToOne = *addressOfOne;
+```
+
+```c++
+Player a{100, new Item{"Golden Sword"}};
+Player b{50, new Item{"Wooden Sword"}}; // b is initialized
 b = a; // Copy Assignment, because b has already been initialized
 ```
 
-#### Deep Copy
+### Deep Copy
 
 This time, you need to ensure to clean up all objects that you deep copied:
 
 ```c++
 Item* item;
 
-Enemy& operator=(const Enemy& other) {
+Player& operator=(const Player& other) {
 	if (this == &other) return *this; // performance benefit if `a = a`
 	delete this.item; // delete the item that we had before copying the other object into us
 	this.item = new Item{other.item}; // now, copy the other item and use it
+	
+	return *this;
 }
 ```
 
-#### Shallow Copy
+### Shallow Copy
 
 But beware, this doesn't go for shallow copied objects:
 
 ```c++
-Player* target;
+Planet* standingOn;
 
-Enemy& operator=(const Enemy& other) {
+Player& operator=(const Player& other) {
 	if (this == &other) return *this; // performance benefit if `a = a`
-	// delete this.target; DO NOT DO THIS, THIS WOULD DELETE THE PLAYER!!
-	this.target = other.target; // shallow copy the other enemy's target:
+	delete this.standingOn; // WRONG: This would destroy the planet
+	this.standingOn = other.standingOn; // shallow copy the other Player's Planet (e.g. Mars):
 }
 ```
 
-### Default Copy
+## Default Copy
 Why does the following code work, even though we haven't defined a copy constructor or assignment operator?
 ```c++
 struct Vector2{
@@ -277,7 +335,7 @@ struct Vector2{
 }
 ```
 
-### No Copy
+## No Copy
 Some classes, you never want to be copied
 - e.g. a GameGrid which takes up a lot of Memory
 - mark the copy constructor and assignment operator as `delete`
@@ -309,66 +367,7 @@ The original and the copy should have equal values.
 
 
 # Quiz
-
-What is the primary problem with shallow copying in C++ classes?
-- A) It leads to excessive memory usage.
-- B) It results in slower performance due to deep copying.
-- C) It causes objects to share the same memory address.
-- D) It prevents objects from being copied entirely.
-
-What is the primary difference between shallow copy and deep copy in C++?
-- A) Shallow copy copies the object's value, while deep copy copies the object's memory address.
-- B) Shallow copy copies only the object's pointers, while deep copy clones all referenced objects.
-- C) Shallow copy creates a new instance of the object, while deep copy updates the existing instance.
-- D) Shallow copy is used for simple data types, while deep copy is used for complex data structures.
-
-What are the requirements for copy semantics in C++?
-- A) Objects should be identical but may be dependent.
-- B) Objects should be equivalent and independent.
-- C) Objects should share the same memory address.
-- D) Objects should have different values but share resources.
-
-How are values copied in C++ when passed to functions or assigned to variables?
-- A) By creating a new instance of the value.
-- B) By copying only the memory address.
-- C) By using shallow copy semantics.
-- D) By performing a bitwise copy of the value.
-
-What happens when a Plain Old Data (POD) type is passed to a function in C++?
-- A) The entire object is copied, including its memory address.
-- B) Only the object's size is copied, not its contents.
-- C) Each member value is copied into the function parameter.
-- D) The object's pointer is copied, not its data.
-
-What happens when a fully-featured class with dynamic memory allocation is copied in C++?
-- A) The object's memory address is shared between the original and the copy.
-- B) Both the original and the copy point to the same dynamically allocated memory.
-- C) The copy constructor allocates new memory for each member of the copy.
-- D) The copy constructor performs a bitwise copy of the original object.
-
-What is the purpose of a copy constructor in C++?
-- A) To initialize a new object using an existing object.
-- B) To assign values from one object to another object.
-- C) To delete the original object after copying its values.
-- D) To compare two objects for equality. 
-
-When is the copy constructor invoked in C++?
-- A) When creating a new object without specifying initial values.
-- B) When copying an uninitialized object to an initialized object.
-- C) When copying an already initialized object to an uninitialized object.
-- D) When deleting an object after its scope ends.
-
-What is the primary purpose of the copy assignment operator in C++?
-- A) To initialize a new object using an existing object.
-- B) To assign values from one object to another object.
-- C) To delete the original object after copying its values.
-- D) To compare two objects for equality.
-
-What happens if a class's copy constructor and copy assignment operator are not explicitly defined in C++?
-- A) The compiler generates default implementations for both.
-- B) The class cannot be copied to another object.
-- C) The class automatically performs deep copying for all members.
-- D) The class automatically performs shallow copying for all members.
+[Link to the Quiz](https://forms.gle/SciLd7Xwx3Rv5EBN9)
 
 # Exercise
 - Implement Copy Semantics into your `String` class
