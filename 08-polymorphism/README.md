@@ -1,10 +1,6 @@
 # 8 Polymorphism
 
 ## Memory Layout
-- Allows for Polymorphism
-- At the Address of `Dog`
-- You find the Data of type `Animal`
-- i.e. `Dog` IS AN `Animal`
 
 ```c++
 class Animal {
@@ -29,6 +25,11 @@ pet(dog);
 
 ![inheritance-memory-layout.png](inheritance-memory-layout.png)
 
+
+- Allows for Polymorphism
+- At the Address of `Dog`
+- You find the Data of type `Animal`
+- i.e. `Dog` IS AN `Animal`
 
 ### Conversion
 - If you use the base class as a value...
@@ -140,20 +141,4 @@ struct Pegasus : Bird, Horse {
 
 # Quiz
 
-What is the memory layout when a Dog object is treated as an Animal object?
-- A) The memory layout of a Dog object.
-- B) The memory layout of an Animal object.
-- C) A mixture of Dog and Animal memory layouts.
-- D) The memory layout depends on the compiler.
-
-What happens during conversion when a Dog object is assigned to an Animal object?
-- A) The whole Dog object is copied into the Animal object.
-- B) The Animal part of the Dog object is copied into an Animal object.
-- C) The Animal object is converted into a Dog object.
-- D) Conversion between unrelated types is not allowed.
-
-What problems arises in the context of multiple inheritance, as illustrated by the "Dreaded Diamond" diagram? (3)
-- A) Memory fragmentation
-- B) Name clashes
-- C) Inefficient memory layout
-- D) Pointer identity loss
+[Link to the Quiz](https://forms.gle/K3zqzuGrDRP9EmwT6)
