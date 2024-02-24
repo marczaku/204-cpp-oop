@@ -1,5 +1,5 @@
-# 7 Runtime Polymorphism
-Inheritance-Based Polymorphism like in C#
+# 9 Virtualization
+Dynamic Linking of Functions and Base Classes during Runtime
 
 ## Virtualization
 
