@@ -371,3 +371,5 @@ The original and the copy should have equal values.
 
 # Exercise
 - Implement Copy Semantics into your `String` class
+  - What does it mean to make a Deep Copy of your `String`?
+  - Think especially about the `buffer`!

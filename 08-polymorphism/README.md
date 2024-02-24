@@ -136,6 +136,11 @@ struct Pegasus : Bird, Horse {
 }
 ```
 
+// derive from Animal
+// inherit from Animal
+// extend Animal
+
+
 ![dreaded-diamond-memory-layout.png](dreaded-diamond-memory-layout.png)
 
 

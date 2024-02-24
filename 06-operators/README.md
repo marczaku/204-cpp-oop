@@ -322,8 +322,10 @@ What is the purpose of the Member Access through Pointer Operator `->*` in C++?
 Add all operators that make sense.
 
 For example, but not limited to:
-- `+` operator to combine two strings to a new string
-- `+=` to append one string to another
-- `[]` to access the string's characters.
-- `<<` for printing the string using `cout`
-- Comparison Operators to find out, which string comes alphabetically first
+- `+` operator to combine two `Strings` to a new `String`
+- `+=` to append one `String` to another
+- `[]` to access the `String`'s characters.
+- `<<` for printing the `String` using `cout`
+- Comparison Operators to find out, which `String` comes alphabetically first
+  - e.g.: `bool a = String{"Hello"} < String{"World"};`
+  - should return `true`, because `H` comes before `W`

@@ -191,3 +191,6 @@ Update your `String` class for `const`-correctness
 - which data members can be `const`?
 - which function arguments?
 - which functions can be made `const`?
+
+Hint: Rider will greatly help you with this.
+- But try to understand, why these members can/should be `const`!

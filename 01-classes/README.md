@@ -362,6 +362,7 @@ For now, we will have one limitation:
   - So, if you wanted your `string` class to be able to hold any string without the user providing a `maxLength`...
   - ...you would have to implement something like a List / DynamicArray in C#
   - which automatically resizes as new elements are added
+  - This means that you create a new buffer, copy the contents from the old to the new buffer and delete the old buffer
 
 ### Example Usage
 ```c++
@@ -399,11 +400,11 @@ You need to figure out the types yourself:
 - `ctor(xxx maxSize)`
   - add a log so you see that an empty string gets constructed
   - create buffer
-  - initialize length & maxSize
+  - initialize `length` & `maxSize`
 - `ctor(xxx defaultText, xxx maxSize)`
   - add a log so you see that a non-empty string gets constructed
   - create buffer
-  - initialize length & maxSize
+  - initialize `length` & `maxSize`
   - append defaultText
 - `~()`
   - add a log so you see what string gets deconstructed
@@ -420,3 +421,23 @@ You need to figure out the types yourself:
   - prints the string that's currently buffered
 - `xxx getString()`
   - returns a c-style string for the currently buffered contents
+
+### More Info
+
+What is a buffer?
+- it is just a data storage that's allocated with more size than originally needed so it can be filled with more data later
+
+What is a buffer in this case?
+- an array of characters in which we can store text.
+
+e.g. the `maxSize` might be 10 and the text `"hej"`:
+
+`{'h','e','j','\0','\0','\0','\0','\0','\0','\0'}`
+- `maxSize`: `10`
+- `length`: `3`
+
+Now, if you append a text like `"san!"`:
+
+`{'h','e','j','s','a','n','!','\0','\0','\0'}`
+- `maxSize`: `10`
+- `length`: `7`
