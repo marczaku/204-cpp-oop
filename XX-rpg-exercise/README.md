@@ -181,3 +181,69 @@ std::cin >> should_continue
 ## Your Turn!
 
 Now it's your turn to add new Features to this Game.
+
+### Skeleton Class
+
+```
+Skeleton spawned with 4 Health.
+Hero attacks Skeleton.
+The attack is very effective!
+Skeleton now has 2 Health.
+
+Skeleton attacks Hero.
+Hero now has 99 Health.
+
+Hero attacks Skeleton.
+The attack is very effective!
+Skeleton now has 0 Health.
+Skeleton died.
+```
+
+Add a Skeleton Class!
+- it inherits from `Unit`
+- it has a parameter-less constructor
+  - that assigns the `name` and `health` as you like to the `Unit`-constructor
+- it takes double damage from all attacks. To achieve this:
+  - add new `virtual` method `takeDamage(int)` to `Unit` class
+  - `Unit`'s implementation reduces `health` by `int` argument
+  - `Skeleton` `override`s the implementation and
+    - outputs that the attack is very effective to the console
+    - invokes the base Method passing the double value of `int` argument
+
+### Infected Class
+
+```
+Infected spawned with 2 Health.
+Hero attacks Infected.
+Infected now has 1 Health.
+
+Infected attacks Hero.
+Hero now has 99 Health.
+
+Hero attacks Infected.
+Infected now has 0 Health.
+Infected died.
+Infected came back from the dead as Zombie with 1 Health.
+
+Zombie attacks Hero.
+hero now has 98 Health.
+
+Hero attacks Zombie.
+Zombie now has 0 Health.
+Zombie died.
+```
+
+Add a Infected Class!
+- it inherits from `Unit`
+- it has a parameter-less constructor
+  - that assigns the `name` and `health` as you like to the `Unit`-constructor
+- it can revive itself once. To achieve this:
+  - override `takeDamage(int)` and invoke the `Unit`'s implementation
+  - if after that, the Infected `is_dead()`:
+    - print a message saying that the Infected has risen from the dead.
+    - set the `health` to `1`, change the `name`
+    - and make sure to "remember" that the Infected has come back from the dead
+    - so it won't do it again next time it dies.
+
+### Random Spawn
+Change `create_enemy` so it returns a random enemy (`Skeleton` or `Infected`). Expand the function as you add new enemy types.

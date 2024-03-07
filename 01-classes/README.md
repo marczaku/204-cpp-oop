@@ -324,6 +324,27 @@ int main() {
 
 # Exercises
 
+## Level Class
+- Make a Level Class
+- Constructor: `int startLevel`, `int experiencePerLevel`
+- Data Members: `level`, `experience`
+- Method: `gainExperience(int)`
+  - adds `int` to `experience`
+  - if `experience` is greater than `experiencePerLevel`: level up!
+- Method: `print()`
+  - prints `Level: X, Experience: X` to the Console.
+
+```c++
+Level level{1, 10}; // Level: 1, Experience: 0
+level.print();
+level.gainExperience(9); // Level: 1, Experience: 9
+level.print();
+level.gainExperience(3); // Level: 2, Experience: 2
+level.print();
+level.gainExperience(18); // Level: 4, Experience: 0
+level.print();
+```
+
 ## Calculator Class
 - Make an Object-Oriented Calculator Application
   - Add a class named `Calculator`
