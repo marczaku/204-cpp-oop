@@ -233,7 +233,7 @@ Zombie now has 0 Health.
 Zombie died.
 ```
 
-Add a Infected Class!
+Add an Infected Class!
 - it inherits from `Unit`
 - it has a parameter-less constructor
   - that assigns the `name` and `health` as you like to the `Unit`-constructor
@@ -247,3 +247,37 @@ Add a Infected Class!
 
 ### Random Spawn
 Change `create_enemy` so it returns a random enemy (`Skeleton` or `Infected`). Expand the function as you add new enemy types.
+
+### Items
+Refactor your code to include an `Item` class that can be attached to either `leftHand` or `rightHand` of `Unit`.
+
+The class has:
+- `Name`: will be printed on every spawn function 
+  - `Infected spawned with Item XXX and 2 Health.`
+  - `Infected spawned with Items XXX and YYY and 2 Health.`
+- `Armor`: if an item has armor, then every attack is reduced by the amount of armor on the item.
+- `Damage`: if an item has damage, then the damage is added on every attack.
+  - Also, it prints the Item name(s) when attacking:
+    - `Hero attacks Infected with Epic Sword.`
+    - `Hero attacks Infected with Small Dagger and Big Dagger.`
+
+Occasionally, random Items drop off killed enemies. The Player can choose to equip the Item to `leftHand`, `rightHand` or skip  equipping it.
+
+
+```
+Hero attacks Zombie with Weak Dagger.
+Zombie now has 0 Health.
+Zombie died.
+
+A Legendary Dagger has dropped.
+Currently Equipped:
+Left Hand: Weak Dagger.
+Right Hand: nothing.
+
+Equip to (L)eft Hand, (R)ight Hand or (D)rop?
+R
+
+Equipped Legendary Dagger to Right Hand.
+
+Infected spawned with Item XXX and 2 Health.
+```
