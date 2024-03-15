@@ -60,6 +60,17 @@ a.replace("HeTTo", "Bye");
 a.print(); // Bye WorTd
 ```
 
+## Additional Resources for the Assignment
+It is recommended that you write the unit tests yourself, but you need help or want to validate your class in the end, check out the provided [Test File](XX-string-resources/1-test-file/).
+
+It is recommended that you create the String Header File yourself, but if you need help or want to validate your class in the end, check out the provided [Header File](XX-string-resources/2-string-header-file/).
+
+It is recommended that you set up a solution with a String Library Project and a String Unit Test Project yourself. But if you're unable to set it up yourself, check out the provided [Solution](XX-string-resources/3-solution/).
+
+The Cherno has made a [Great Video](https://www.youtube.com/watch?v=ehMg6zvXuMY) about a String class just to explain Copy and Move. I recommend it as a resource for this assignment.
+
+To understand, what we're even trying to build, it can help to check out a video about C++'s existing `string`-Class [Right Here](https://www.youtube.com/watch?v=ijIxcB9qjaU).
+
 ## Bonus Criteria
 - Implement the Dynamic Array described in 3-classes-and-files
   - including compile-time polymorphism
