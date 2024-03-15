@@ -61,7 +61,7 @@ a.print(); // Bye WorTd
 ```
 
 ## Additional Resources for the Assignment
-It is recommended that you write the unit tests yourself, but you need help or want to validate your class in the end, check out the provided [Test File](XX-string-resources/1-test-file/).
+It is recommended that you write the unit tests yourself, but you need help or want to validate your class in the end, check out the provided [Test File](XX-string-resources/1-test-file/). Note: You need to remove the comments `/* comment start` and ` commend end */` around the tests to enable them.
 
 It is recommended that you create the String Header File yourself, but if you need help or want to validate your class in the end, check out the provided [Header File](XX-string-resources/2-string-header-file/).
 
