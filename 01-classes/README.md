@@ -367,7 +367,7 @@ cout << calculator.getNumber() << "\n"; // should say 5
 
 ## String-Class!
 
-The String Class will be used to make using strings easier in C++!
+The String Class will be used to make using strings as easy to use in C++ as they are in C#!
 
 It will allow us to easily:
 - Create Strings
@@ -402,7 +402,7 @@ Allihopa!
 
 And all of that without having to think about Pointers or Arrays ever again
 
-In fact, C++ comes with its own OOP `string` class which we will use in the future!
+In fact, C++ comes with its own object-oriented `std::string` class which we will use in the future!
 
 ### Private Members
 You need to figure out the types yourself:
@@ -413,6 +413,7 @@ You need to figure out the types yourself:
   - this variable will be provided by the user in the constructor
   - and set a limitation on how long this string can ever become
   - it may not be exceeded as the user appends more to this string
+  - assign it to the data member within the constructor
 - `xxx buffer;`
   - the buffer is used to store the characters of this string
   - you can use `maxSize` for the size of the buffer
@@ -420,24 +421,29 @@ You need to figure out the types yourself:
 ### Public Members
 - `ctor(xxx maxSize)`
   - add a log so you see that an empty string gets constructed
-  - create buffer
+  - create a buffer of the correct size
   - initialize `length` & `maxSize`
 - `ctor(xxx defaultText, xxx maxSize)`
   - add a log so you see that a non-empty string gets constructed
-  - create buffer
+  - create `buffer`
   - initialize `length` & `maxSize`
-  - append defaultText
+  - copy the defaultText to `buffer`
+    - you need to assign one character at a time!
+    - the pros among you can try using more efficient tools like `memcpy`
 - `~()`
   - add a log so you see what string gets deconstructed
-  - delete buffer
+  - delete the `buffer`
+    - Remember how you delete an array!
 - `append(xxx text)`
-  - checks for maxSize! -> exception
-  - adds the given text to the string's buffer
-  - updates length
+  - checks for maxSize!
+  - adds the given text to the string's buffer 
+    - you need to again add one character at a time at the right place
+    - the pros among you can again use `memcpy` for efficiency
+  - updates length to the new length (old length + length of new text)
 - `appendLine(xxx text)`
   - checks for maxSize! -> exception
   - adds the given text + line break to the string's buffer
-  - updates length
+  - updates length as usual
 - `void print()`
   - prints the string that's currently buffered
 - `xxx getString()`

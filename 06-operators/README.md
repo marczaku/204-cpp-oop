@@ -325,7 +325,7 @@ For example, but not limited to:
 - `+` operator to combine two `Strings` to a new `String`
 - `+=` to append one `String` to another
 - `[]` to access the `String`'s characters.
-- `<<` for printing the `String` using `cout`
+- `<<` for printing the `String` using `cout` to an `ostream`
 - Comparison Operators to find out, which `String` comes alphabetically first
   - e.g.: `bool a = String{"Hello"} < String{"World"};`
   - should return `true`, because `H` comes before `W`

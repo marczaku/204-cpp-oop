@@ -484,3 +484,4 @@ Player(Player& other) = delete; // explicitly remove generation
 - Implement Move Semantics into your `String` class
   - What does it mean to move the values of your `String`?
   - Think especially about the `buffer`!
+  - Implement both the Move Constructor and Move Assignment Operator
